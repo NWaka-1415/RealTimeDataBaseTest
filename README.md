@@ -1,0 +1,2 @@
+# RealTimeDataBaseTest
+Firebaseによるリアルタイムデータベースの動作を確認しつつ，Material Designの適用実験を行う。

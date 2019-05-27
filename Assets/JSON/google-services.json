@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1041545114692",
+    "firebase_url": "https://realtimedatebasetest.firebaseio.com",
+    "project_id": "realtimedatebasetest",
+    "storage_bucket": "realtimedatebasetest.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041545114692:android:b1a13510fceabe63",
+        "android_client_info": {
+          "package_name": "NWaka.testApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1041545114692-gv8ncvk0qt7jea73bdiips68e9vppugu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTzu5Don4Qx9iXTnJkz2qCeLX04G64_SM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1041545114692-gv8ncvk0qt7jea73bdiips68e9vppugu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

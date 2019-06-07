@@ -61,6 +61,7 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         /// コンストラクタ
         /// </summary>
         /// <param name="username"></param>
+        /// <param name="json"></param>
         public UserData(string username)
         {
             _username = username;
@@ -72,6 +73,10 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
             _havingCards[3] = new Card(Card.CardTypes.Skull);
         }
 
+        /// <summary>
+        /// 自分自身のJson形式を返却
+        /// </summary>
+        /// <returns>string Jsonデータ</returns>
         public string CreateJson()
         {
             return JsonUtility.ToJson(this);
@@ -80,6 +85,11 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         public string Username => _username;
 
         public Card[] HavingCards => _havingCards;
+
+        public static UserData CreateUserDataFromJson(string json)
+        {
+            return JsonUtility.FromJson<UserData>(json);
+        }
     }
 
     protected override void Awake()
@@ -112,6 +122,16 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         _database = FirebaseDatabase.DefaultInstance.GetReference("userData");
 
         //Read
+        UserData userData = ReadUserData();
+
+        //Write
+        WriteUserData(new UserData("hoge"));
+        //_database.SetValueAsync("2");
+    }
+
+    public UserData ReadUserData()
+    {
+        string jsonData = "";
         _database.GetValueAsync().ContinueWith(task =>
         {
             if (task.IsFaulted)
@@ -121,15 +141,11 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
             else if (task.IsCompleted)
             {
                 DataSnapshot dataSnapshot = task.Result;
-                string jsonData = dataSnapshot.GetRawJsonValue();
-                //Debug.Log(jsonData);
+                jsonData = dataSnapshot.GetRawJsonValue();
             }
         });
-
-
-        //Write
-        WriteUserData(new UserData("hoge"));
-        //_database.SetValueAsync("2");
+        if (jsonData == "") return null;
+        return UserData.CreateUserDataFromJson(jsonData);
     }
 
     public void WriteUserData(UserData userData)

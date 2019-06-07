@@ -214,7 +214,7 @@ GameObject:
   - component: {fileID: 803701381}
   - component: {fileID: 803701382}
   m_Layer: 0
-  m_Name: Sample
+  m_Name: OverAllManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -228,7 +228,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 803701380}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.7058055, y: -5.3166485, z: -3697.9883}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

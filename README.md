@@ -1,2 +1,4 @@
-# RealTimeDataBaseTest
-Firebaseによるリアルタイムデータベースの動作を確認しつつ，Material Designの適用実験を行う。
+# SKULL(old name:RealTimeDataBaseTest)
+Firebaseによるリアルタイムデータベースの動作を確認しつつ，Material Designの適用実験を行っていたプロジェクト。
+ボードゲーム「SKULL」を作るプロジェクトに変更されました。
+オフラインでCPUと戦うモードの他に，本プロジェクト最大の目的であるFirebaseのリアルタイムデータベースを用いたオンライン対戦モードを実装する予定。

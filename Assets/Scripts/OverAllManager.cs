@@ -108,8 +108,7 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
             }
             else
             {
-                Debug.LogError(System.String.Format(
-                    "Could not resolve all Firebase dependencies: {0}", dependencyStatus));
+                Debug.LogError($"Could not resolve all Firebase dependencies: {dependencyStatus}");
                 // Firebase Unity SDK is not safe to use here.
             }
         });

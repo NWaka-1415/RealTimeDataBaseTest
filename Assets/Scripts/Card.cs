@@ -8,12 +8,21 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     private OverAllManager.Card.CardTypes _cardType = OverAllManager.Card.CardTypes.Flower;
     private Vector2 _defaultPos;
     private bool _enable;
+    [SerializeField] private RectTransform _rectTransform = null;
 
     public void Initialize(Vector2 pos, OverAllManager.Card.CardTypes cardType)
     {
         _enable = false;
         _cardType = cardType;
         _defaultPos = pos;
+    }
+    
+    public void Initialize(OverAllManager.Card.CardTypes cardType)
+    {
+        _enable = false;
+        _cardType = cardType;
+        _defaultPos = _rectTransform.localPosition;
+        Debug.Log(_defaultPos);
     }
 
     /// <summary>
@@ -33,7 +42,6 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public void OnBeginDrag(PointerEventData eventData)
     {
         _enable = true;
-        _defaultPos = transform.position;
     }
 
     /// <summary>
@@ -43,7 +51,7 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!_enable) return;
-        transform.position = _defaultPos;
+        _rectTransform.localPosition = _defaultPos;
     }
 
     /// <summary>
@@ -58,9 +66,16 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         foreach (RaycastResult hit in raycastResults)
         {
             // もし DroppableField の上なら、その位置に固定する
-            if (hit.gameObject.CompareTag("DroppableField"))
+            if (hit.gameObject.CompareTag(OverAllManager.TagNames.DroppableField))
             {
                 transform.position = hit.gameObject.transform.position;
+                _enable = false;
+                CardField cardField = hit.gameObject.GetComponent<CardField>();
+                cardField.PlusCard();
+            }
+            else if (hit.gameObject.CompareTag(OverAllManager.TagNames.CardDefaultField))
+            {
+                _rectTransform.localPosition = _defaultPos;
                 _enable = false;
             }
         }

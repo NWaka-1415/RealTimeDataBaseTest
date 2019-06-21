@@ -1,12 +1,77 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class TitleSceneManager : MonoBehaviour
 {
-    public void OnclickTitle()
+    [SerializeField] private GameObject _menu = null;
+
+    private void Awake()
+    {
+        _menu.transform.localScale = Vector3.zero;
+        _menu.SetActive(false);
+    }
+
+    /// <summary>
+    /// メニューを開く
+    /// </summary>
+    public void OpenMenu()
+    {
+        _menu.SetActive(true);
+        _menu.transform.DOScale(1f, 0.3f);
+    }
+
+    /// <summary>
+    /// メニューを閉じる
+    /// </summary>
+    public void CloseMenu()
+    {
+        _menu.transform.DOScale(0f, 0.3f).OnComplete(() => _menu.SetActive(false));
+    }
+
+    /// <summary>
+    /// メインシーンに遷移
+    /// </summary>
+    public void MoveToMain()
     {
         SceneManager.LoadSceneAsync("MainScene");
+    }
+
+    /// <summary>
+    /// 3人対戦セット
+    /// </summary>
+    public void Onclick3Players()
+    {
+        OverAllManager.PlayerNumber = 3;
+        MoveToMain();
+    }
+
+    /// <summary>
+    /// 4人対戦セット
+    /// </summary>
+    public void Onclick4Players()
+    {
+        OverAllManager.PlayerNumber = 4;
+        MoveToMain();
+    }
+
+    /// <summary>
+    /// 5人対戦セット
+    /// </summary>
+    public void Onclick5Players()
+    {
+        OverAllManager.PlayerNumber = 5;
+        MoveToMain();
+    }
+
+    /// <summary>
+    /// 6人対戦セット
+    /// </summary>
+    public void Onclick6Players()
+    {
+        OverAllManager.PlayerNumber = 6;
+        MoveToMain();
     }
 }

@@ -11,6 +11,13 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
 {
     private DatabaseReference _database;
 
+    public static class TagNames
+    {
+        public static string CardDefaultField { get; } = "CardDefaultField";
+        public static string DroppableField { get; } = "DroppableField";
+        public static string GameController { get; } = "GameController";
+    }
+
     /// <summary>
     /// スカルもしくは花のカードを表すクラス
     /// </summary>
@@ -92,9 +99,11 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         }
     }
 
-    protected override void Awake()
+    private static int _playerNumber;
+
+    // Start is called before the first frame update
+    void Start()
     {
-        base.Awake();
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             var dependencyStatus = task.Result;
@@ -112,16 +121,14 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
                 // Firebase Unity SDK is not safe to use here.
             }
         });
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
+        
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://realtimedatebasetest.firebaseio.com/");
         _database = FirebaseDatabase.DefaultInstance.GetReference("userData");
+        _playerNumber = 3;
 
         //Read
         UserData userData = ReadUserData();
+        Debug.Log(userData);
 
         //Write
         WriteUserData(new UserData("hoge"));
@@ -150,6 +157,22 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     public void WriteUserData(UserData userData)
     {
         _database.Child(userData.Username).Child(userData.Username).SetRawJsonValueAsync(userData.CreateJson());
+#if UNITY_EDITOR
         Debug.Log("Complete");
+#endif
+    }
+
+    /// <summary>
+    /// 3-6のみ
+    /// </summary>
+    public static int PlayerNumber
+    {
+        get { return _playerNumber; }
+        set
+        {
+            if (value < 3) _playerNumber = 3;
+            else if (value > 6) _playerNumber = 6;
+            else _playerNumber = value;
+        }
     }
 }

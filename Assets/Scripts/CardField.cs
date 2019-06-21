@@ -13,4 +13,14 @@ public class CardField : MonoBehaviour
     {
         _cardNumber = 0;
     }
+
+    /// <summary>
+    /// 場に置かれたカード数を加算
+    /// </summary>
+    public void PlusCard()
+    {
+        _cardNumber++;
+    }
+
+    public int CardNumber => _cardNumber;
 }

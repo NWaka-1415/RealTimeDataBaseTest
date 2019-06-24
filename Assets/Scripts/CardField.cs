@@ -5,22 +5,57 @@ using UnityEngine;
 public class CardField : MonoBehaviour
 {
     /// <summary>
-    /// 自分の場に出ているカードの数
+    /// 置かれているカード
     /// </summary>
-    private int _cardNumber;
+    private List<Card> _cards;
+
+    /// <summary>
+    /// ターン中に配置されたカード数
+    /// </summary>
+    private int _turnCardNumber;
+
+    private Vector3[] _dropPos;
 
     private void Awake()
     {
-        _cardNumber = 0;
+        _cards = new List<Card>();
+        _turnCardNumber = 0;
     }
 
     /// <summary>
     /// 場に置かれたカード数を加算
     /// </summary>
-    public void PlusCard()
+    public void PlusCard(Card card)
     {
-        _cardNumber++;
+        _cards.Add(card);
+        _turnCardNumber++;
     }
 
-    public int CardNumber => _cardNumber;
+    /// <summary>
+    /// Challengeによってフィールドが選択されたとき
+    /// そのフィールド上のカードは全部表にされる
+    /// ついでにスカルが含まれていないかを返却
+    /// </summary>
+    public bool SelectField()
+    {
+        bool skull = false;
+        foreach (Card card in _cards)
+        {
+            card.Open();
+            if (card.CardType == OverAllManager.Card.CardTypes.Skull) skull = true;
+        }
+
+        return skull;
+    }
+
+    /// <summary>
+    /// ターンが終わるとき
+    /// ターン中に配置されたカード数を0にリセット
+    /// </summary>
+    public void TurnEnd()
+    {
+        _turnCardNumber = 0;
+    }
+
+    public int TurnCardNumber => _turnCardNumber;
 }

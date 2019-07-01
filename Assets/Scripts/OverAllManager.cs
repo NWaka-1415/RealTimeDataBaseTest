@@ -21,6 +21,7 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     public static class PathName
     {
         public static string UserId { get; } = "UserId";
+        public static string Count { get; } = "Count";
     }
 
     /// <summary>
@@ -157,6 +158,11 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     /// </summary>
     private static UserData[] _userData;
 
+    /// <summary>
+    /// 初期起動時かどうかのカウント
+    /// </summary>
+    private static int _count;
+
     private static int _playerNumber;
 
     // Start is called before the first frame update
@@ -185,6 +191,8 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         _playerNumber = 3;
 
         _database.ValueChanged += HandleValueChanged;
+
+        Load();
     }
 
     /// <summary>
@@ -243,7 +251,8 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     /// </summary>
     public static void Load()
     {
-        _yourUserData = new UserData("", PlayerPrefs.GetString(PathName.UserId, "hogehoge1415"));
+        _count = PlayerPrefs.GetInt(PathName.Count, 0);
+        _yourUserData = new UserData("", PlayerPrefs.GetString(PathName.UserId, CreateId()));
     }
 
     /// <summary>
@@ -256,9 +265,19 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     }
 
     /// <summary>
+    /// Create a unique id.
+    /// </summary>
+    /// <returns></returns>
+    private static string CreateId()
+    {
+        var time = DateTime.UtcNow;
+        return $"id{time.Year}{time.Month}{time.Day}{time.Hour}{time.Minute}{time.Second}{time.Millisecond}";
+    }
+
+    /// <summary>
     /// create your user data.
     /// </summary>
-    public void SetUser(string username)
+    public static void SetUser(string username)
     {
         _yourUserData.SetUserName(username);
     }
@@ -280,4 +299,6 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     public static UserData YourUserData => _yourUserData;
 
     public static UserData[] UserDatas => _userData;
+
+    public static int Count => _count;
 }

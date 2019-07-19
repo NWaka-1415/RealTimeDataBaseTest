@@ -9,7 +9,7 @@ public class GameSceneManager : MonoBehaviour
     /// 現在行動可能なプレイヤーの番号
     /// Player number which is able to action
     /// </summary>
-    private int _activeUserNumber;
+    private static int _activeUserNumber;
 
     /// <summary>
     /// あなたのプレイヤーの番号
@@ -21,10 +21,9 @@ public class GameSceneManager : MonoBehaviour
     /// 現在のターン数
     /// Turn number on now
     /// </summary>
-    private int _turn;
+    private static int _turn;
 
     [SerializeField] private CardField _cardField = null;
-    [SerializeField] private Card[] _cards = new Card[4];
 
     public static readonly Sprite[] CardSkullSprites = new Sprite[6];
     public static readonly Sprite[] CardFlowerSprites = new Sprite[6];
@@ -38,6 +37,9 @@ public class GameSceneManager : MonoBehaviour
     [SerializeField] private Slider _challengeNumberSetSlider = null;
 
     [SerializeField] private Button _challengeButton = null;
+    [SerializeField] private Button _okButton = null;
+
+    [SerializeField] private Player _player = null;
 
     [SerializeField] private CPU[] _cpus = new CPU[5];
 
@@ -47,7 +49,7 @@ public class GameSceneManager : MonoBehaviour
     /// Yes=>true
     /// No=>false
     /// </summary>
-    private bool _isChallenge;
+    private static bool _isChallenge;
 
     /// <summary>
     /// 宣言されているカード枚数
@@ -57,9 +59,11 @@ public class GameSceneManager : MonoBehaviour
     private void Awake()
     {
         _activeUserNumber = 0;
+        _turn = 0;
         _isChallenge = false;
         _challengeButton.interactable = false;
 
+        //リソース読み込み
         for (int i = 0; i < 6; i++)
         {
             Sprite[] cards = Resources.LoadAll<Sprite>($"Cards/Card{i}");
@@ -77,32 +81,20 @@ public class GameSceneManager : MonoBehaviour
 //        _overAllManager = GameObject.FindWithTag(OverAllManager.TagNames.GameController).GetComponent<OverAllManager>();
         for (int i = OverAllManager.PlayerNumber - 1; i < _cpus.Length; i++)
         {
+            // 不要なCPU分の場をHide
             _cpus[i].gameObject.SetActive(false);
         }
 
-
-        //対戦相手のカードフィールドセット
+        _player.CardField.Initialize(OverAllManager.YourUserData);
         for (int i = 0; i < OverAllManager.PlayerNumber; i++)
         {
             _cpus[i].CardField.Initialize(new OverAllManager.UserData($"hoge{i}", $"hoge{i}"));
         }
 
-        _cardField.Initialize(OverAllManager.YourUserData);
-
         _bottomCard.SetActive(true);
         _bottomChallenge.SetActive(false);
-    }
 
-    private void Start()
-    {
-        for (int i = 0; i < _cards.Length - 1; i++)
-        {
-            _cards[i].Initialize(OverAllManager.Card.CardTypes.Flower, CardFlowerSprites[0], CardBackSprites[0]);
-            OverAllManager.YourUserData.HavingCards[i] = new OverAllManager.Card(_cards[i].CardType, _cards[i].State);
-        }
-
-        _cards[3].Initialize(OverAllManager.Card.CardTypes.Skull, CardSkullSprites[0], CardFlowerSprites[0]);
-        OverAllManager.YourUserData.HavingCards[3] = new OverAllManager.Card(_cards[3].CardType, _cards[3].State);
+        _okButton.onClick.AddListener(_player.Decide);
     }
 
     private void Update()
@@ -112,34 +104,33 @@ public class GameSceneManager : MonoBehaviour
         {
             _selectNumber.text = $"{_challengeNumberSetSlider.value}枚";
         }
+
+        _okButton.interactable = _activeUserNumber == 0;
+    }
+
+    public static void SetChallenge()
+    {
+        if (_turn < 1) return;
+        _isChallenge = true;
+    }
+
+    public static void Advance()
+    {
+        _activeUserNumber++;
+        if (_activeUserNumber >= OverAllManager.PlayerNumber) _activeUserNumber = 0;
+    }
+
+    /// <summary>
+    /// ターン
+    /// </summary>
+    public static void AdvanceTurn()
+    {
+        _turn++;
     }
 
     /*
      * before challenge behavior
      */
-
-    /// <summary>
-    /// 自分の手番を終了
-    /// 決定ボタンを押した
-    /// </summary>
-    public void MyTurnEnd()
-    {
-        if (_cardField.TurnCardNumber > 1)
-        {
-            // 警告
-        }
-        else
-        {
-            _activeUserNumber++;
-            if (_activeUserNumber >= OverAllManager.PlayerNumber)
-            {
-                _turn++;
-                _activeUserNumber = 0;
-            }
-
-            _cardField.TurnEnd();
-        }
-    }
 
     /// <summary>
     /// チャレンジを押した際

@@ -4,18 +4,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IDropHandler
+public class Card : MonoBehaviour
 {
     private OverAllManager.Card _card;
     private Vector2 _defaultPos;
+    private Player _player = null;
     [SerializeField] private Image _image = null;
+    [SerializeField] private Image _selectImage = null;
+    [SerializeField] private Button _button = null;
+    private bool _isSelected;
     private Sprite _frontSprite;
     private Sprite _backSprite;
-
-    /// <summary>
-    /// ドロップ出来るか
-    /// </summary>
-    private bool _enable;
 
     /// <summary>
     /// 決定されたカードか否か
@@ -47,14 +46,15 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         bool isYours = true)
     {
         _card = new OverAllManager.Card(cardType);
-        _enable = false;
         _decided = false;
+        _selectImage.enabled = false;
+        _isSelected = false;
         _frontSprite = front;
         _backSprite = back;
         _defaultPos = pos;
         _isYours = isYours;
-        if (_isYours) _image.sprite = _frontSprite;
-        else _image.sprite = _backSprite;
+        if (_isYours) _button.onClick.AddListener(OnclickSelect);
+        _image.sprite = _isYours ? _frontSprite : _backSprite;
     }
 
     /// <summary>
@@ -67,6 +67,44 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public void Initialize(OverAllManager.Card.CardTypes cardType, Sprite front, Sprite back, bool isYours = true)
     {
         Initialize(_rectTransform.localPosition, cardType, front, back, isYours);
+    }
+
+    /// <summary>
+    /// プレイヤーをセット
+    /// </summary>
+    /// <param name="player"></param>
+    public void SetParentPlayer(Player player)
+    {
+        _player = player;
+//        Debug.Log($"Player:{player}");
+    }
+
+    /// <summary>
+    /// クリックにより選択
+    /// </summary>
+    public void OnclickSelect()
+    {
+        _player.Select(this);
+    }
+
+    /// <summary>
+    /// 選択
+    /// </summary>
+    public void Select()
+    {
+        if(_decided) return;
+        _isSelected = true;
+        _selectImage.enabled = _isSelected;
+    }
+
+    /// <summary>
+    /// 非選択
+    /// </summary>
+    public void Unselect()
+    {
+        if(_decided) return;
+        _isSelected = false;
+        _selectImage.enabled = _isSelected;
     }
 
     /// <summary>
@@ -83,7 +121,6 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public void ResetCard()
     {
         _card.Close();
-        _enable = false;
     }
 
     /// <summary>
@@ -97,68 +134,4 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public OverAllManager.Card.States State => _card.State;
 
     public OverAllManager.Card.CardTypes CardType => _card.CardType;
-
-    /// <summary>
-    /// ドラッグ中
-    /// </summary>
-    /// <param name="eventData"></param>
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!_isYours) return;
-        if (!_enable) return;
-        transform.position = eventData.position;
-    }
-
-    /// <summary>
-    /// ドラッグ開始
-    /// </summary>
-    /// <param name="eventData"></param>
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if (!_isYours) return;
-        if (_decided) return;
-        _enable = true;
-    }
-
-    /// <summary>
-    /// ドラッグ終了
-    /// </summary>
-    /// <param name="eventData"></param>
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (!_isYours) return;
-        if (!_enable) return;
-        _rectTransform.localPosition = _defaultPos;
-    }
-
-    /// <summary>
-    /// ドロップ
-    /// </summary>
-    /// <param name="eventData"></param>
-    public void OnDrop(PointerEventData eventData)
-    {
-        if (!_isYours) return;
-        if (!_enable) return;
-        List<RaycastResult> raycastResults = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, raycastResults);
-
-        foreach (RaycastResult hit in raycastResults)
-        {
-            Debug.Log($"{this.gameObject.name} hits {hit.gameObject.name}");
-            // もし DroppableField の上なら、その位置に固定する
-            if (hit.gameObject.CompareTag(OverAllManager.TagNames.DroppableField))
-            {
-                CardField cardField = hit.gameObject.GetComponent<CardField>();
-                transform.position = cardField.DropPos;
-                _rectTransform.SetAsLastSibling();
-                _enable = false;
-                cardField.PlusCard(this);
-            }
-            else if (hit.gameObject.CompareTag(OverAllManager.TagNames.CardDefaultField))
-            {
-                _rectTransform.localPosition = _defaultPos;
-                _enable = false;
-            }
-        }
-    }
 }

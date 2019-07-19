@@ -100,6 +100,8 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
 
         [SerializeField] private int _point;
 
+        [SerializeField] private bool _isActive;
+
         /// <summary>
         /// コンストラクタ
         /// </summary>

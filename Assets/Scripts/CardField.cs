@@ -12,11 +12,6 @@ public class CardField : MonoBehaviour
     [SerializeField] private Stack<Card> _cards;
 
     /// <summary>
-    /// ターン中に配置されたカード数
-    /// </summary>
-    private int _turnCardNumber;
-
-    /// <summary>
     /// 表 is Open
     /// 裏 is Close
     /// </summary>
@@ -34,7 +29,6 @@ public class CardField : MonoBehaviour
     {
         _userData = userData;
         _cards = new Stack<Card>();
-        _turnCardNumber = 0;
         _dropPos = new[]
         {
             transform.position + new Vector3(-10, -10),
@@ -49,8 +43,10 @@ public class CardField : MonoBehaviour
     /// </summary>
     public void PlusCard(Card card)
     {
+        card.transform.position = this.gameObject.transform.position;
+        card.Unselect(); //解除
         _cards.Push(card);
-        _turnCardNumber++;
+        DisableCards();
     }
 
     /// <summary>
@@ -98,18 +94,6 @@ public class CardField : MonoBehaviour
 
         return skull;
     }
-
-    /// <summary>
-    /// ターンが終わるとき
-    /// ターン中に配置されたカード数を0にリセット
-    /// </summary>
-    public void TurnEnd()
-    {
-        _turnCardNumber = 0;
-        DisableCards();
-    }
-
+    
     public Vector3 DropPos => _dropPos[_cards.Count];
-
-    public int TurnCardNumber => _turnCardNumber;
 }

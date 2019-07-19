@@ -2011,12 +2011,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardField: {fileID: 637838590}
-  _flowerCards:
+  _myCards:
   - {fileID: 1587011}
   - {fileID: 1214596035}
   - {fileID: 386835150}
-  _skullCard: {fileID: 255787251}
+  - {fileID: 255787251}
+  _cardField: {fileID: 637838590}
+  _playerNumber: 0
 --- !u!1001 &639487406
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2231,6 +2232,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 646754817}
   m_CullTransparentMesh: 0
+--- !u!1 &735145185
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 735145186}
+  - component: {fileID: 735145187}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &735145186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 735145185}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &735145187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 735145185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23af36feaa332644db0c86f7eec00fb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _myCards:
+  - {fileID: 49977775}
+  - {fileID: 791789073}
+  - {fileID: 1121943043}
+  - {fileID: 37644564}
+  _cardField: {fileID: 571996708}
+  _playerNumber: 0
 --- !u!1 &754434546
 GameObject:
   m_ObjectHideFlags: 0
@@ -2755,7 +2806,7 @@ PrefabInstance:
     - target: {fileID: 224333840507381176, guid: f441c161692704f8fa30163cc8ea8c53,
         type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 224333840507381176, guid: f441c161692704f8fa30163cc8ea8c53,
         type: 3}
@@ -3439,12 +3490,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardField: {fileID: 1207270511}
-  _flowerCards:
+  _myCards:
   - {fileID: 1214879603}
   - {fileID: 365161242}
   - {fileID: 1042095651}
-  _skullCard: {fileID: 182558232}
+  - {fileID: 182558232}
+  _cardField: {fileID: 1207270511}
+  _playerNumber: 0
 --- !u!1001 &1214596033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4074,12 +4126,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardField: {fileID: 1447869870}
-  _flowerCards:
+  _myCards:
   - {fileID: 1137193361}
   - {fileID: 1907704509}
   - {fileID: 1994368382}
-  _skullCard: {fileID: 2007749046}
+  - {fileID: 2007749046}
+  _cardField: {fileID: 1447869870}
+  _playerNumber: 0
 --- !u!1 &1470468225
 GameObject:
   m_ObjectHideFlags: 0
@@ -4566,12 +4619,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardField: {fileID: 1560645105}
-  _flowerCards:
+  _myCards:
   - {fileID: 1445438010}
   - {fileID: 1691989973}
   - {fileID: 1723491689}
-  _skullCard: {fileID: 284329371}
+  - {fileID: 284329371}
+  _cardField: {fileID: 1560645105}
+  _playerNumber: 0
 --- !u!1001 &1587874891
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5697,12 +5751,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardField: {fileID: 1931471330}
-  _flowerCards:
+  _myCards:
+  - {fileID: 1587874893}
   - {fileID: 1777383690}
   - {fileID: 1546545559}
   - {fileID: 762591056}
-  _skullCard: {fileID: 1587874893}
+  _cardField: {fileID: 1931471330}
+  _playerNumber: 0
 --- !u!1001 &1994368380
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5904,7 +5959,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2006479984
 GameObject:
@@ -5936,17 +5991,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardField: {fileID: 571996708}
-  _cards:
-  - {fileID: 49977775}
-  - {fileID: 791789073}
-  - {fileID: 1121943043}
-  - {fileID: 37644564}
   _bottomCard: {fileID: 1510396761}
   _bottomChallenge: {fileID: 1741096287}
   _challengeNumberText: {fileID: 1478458538}
   _selectNumber: {fileID: 1590998317}
   _challengeNumberSetSlider: {fileID: 1560215102}
   _challengeButton: {fileID: 576003774}
+  _okButton: {fileID: 305335260}
+  _player: {fileID: 735145187}
   _cpus:
   - {fileID: 1931471331}
   - {fileID: 1560645106}

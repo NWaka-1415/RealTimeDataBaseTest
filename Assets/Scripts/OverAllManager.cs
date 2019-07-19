@@ -21,7 +21,14 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     public static class PathName
     {
         public static string UserId { get; } = "UserId";
+        public static string UserName { get; } = "UserName";
         public static string Count { get; } = "Count";
+    }
+
+    public static class SceneName
+    {
+        public static string MainScene { get; } = "MainScene";
+        public static string TitleScene { get; } = "TitleScene";
     }
 
     /// <summary>
@@ -91,7 +98,7 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         /// </summary>
         [SerializeField] private Card[] _havingCards = new Card[4];
 
-        [SerializeField] private int _life;
+        [SerializeField] private int _point;
 
         /// <summary>
         /// コンストラクタ
@@ -102,7 +109,7 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         {
             _username = username;
             _userId = userId;
-            _life = 2;
+            _point = 2;
             for (int i = 0; i < _havingCards.Length - 1; i++)
             {
                 _havingCards[i] = new Card(Card.CardTypes.Flower);
@@ -117,15 +124,14 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         }
 
         /// <summary>
-        /// ライフを1減らす
+        /// ポイントを追加
         /// </summary>
-        public void DecreaseLife()
+        public void AddPoint()
         {
-            _life--;
-            if (_life < 0) _life = 0;
+            _point++;
         }
 
-        public int Life => _life;
+        public int Point => _point;
 
         /// <summary>
         /// 自分自身のJson形式を返却
@@ -252,7 +258,8 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     public static void Load()
     {
         _count = PlayerPrefs.GetInt(PathName.Count, 0);
-        _yourUserData = new UserData("", PlayerPrefs.GetString(PathName.UserId, CreateId()));
+        _yourUserData = new UserData(PlayerPrefs.GetString(PathName.UserName, ""),
+            PlayerPrefs.GetString(PathName.UserId, CreateId()));
     }
 
     /// <summary>
@@ -261,6 +268,16 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     public static void Save()
     {
         PlayerPrefs.SetString(PathName.UserId, _yourUserData.UserId);
+        PlayerPrefs.SetString(PathName.UserName, _yourUserData.Username);
+        PlayerPrefs.SetInt(PathName.Count, _count);
+        PlayerPrefs.Save();
+    }
+
+    public static void ResetData()
+    {
+        PlayerPrefs.SetInt(PathName.Count, 0);
+        PlayerPrefs.SetString(PathName.UserName, null);
+        PlayerPrefs.SetString(PathName.UserId, null);
         PlayerPrefs.Save();
     }
 
@@ -270,7 +287,7 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     /// <returns></returns>
     private static string CreateId()
     {
-        var time = DateTime.UtcNow;
+        DateTime time = DateTime.UtcNow;
         return $"id{time.Year}{time.Month}{time.Day}{time.Hour}{time.Minute}{time.Second}{time.Millisecond}";
     }
 
@@ -280,6 +297,8 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
     public static void SetUser(string username)
     {
         _yourUserData.SetUserName(username);
+        _count++;
+        Save();
     }
 
     /// <summary>

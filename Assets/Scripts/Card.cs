@@ -18,6 +18,12 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     private bool _enable;
 
     /// <summary>
+    /// 決定されたカードか否か
+    /// true:決定済み
+    /// </summary>
+    private bool _decided;
+
+    /// <summary>
     /// プレイヤーの持っているカードかどうか
     /// プレイヤーのもの=>true
     /// CPU or 対戦相手=>false
@@ -42,6 +48,7 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     {
         _card = new OverAllManager.Card(cardType);
         _enable = false;
+        _decided = false;
         _frontSprite = front;
         _backSprite = back;
         _defaultPos = pos;
@@ -60,6 +67,14 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public void Initialize(OverAllManager.Card.CardTypes cardType, Sprite front, Sprite back, bool isYours = true)
     {
         Initialize(_rectTransform.localPosition, cardType, front, back, isYours);
+    }
+
+    /// <summary>
+    /// 決定済み
+    /// </summary>
+    public void SetDisable()
+    {
+        _decided = true;
     }
 
     /// <summary>
@@ -101,6 +116,7 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (!_isYours) return;
+        if (_decided) return;
         _enable = true;
     }
 
@@ -114,7 +130,7 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         if (!_enable) return;
         _rectTransform.localPosition = _defaultPos;
     }
-    
+
     /// <summary>
     /// ドロップ
     /// </summary>
@@ -122,17 +138,20 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public void OnDrop(PointerEventData eventData)
     {
         if (!_isYours) return;
+        if (!_enable) return;
         List<RaycastResult> raycastResults = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventData, raycastResults);
 
         foreach (RaycastResult hit in raycastResults)
         {
+            Debug.Log($"{this.gameObject.name} hits {hit.gameObject.name}");
             // もし DroppableField の上なら、その位置に固定する
             if (hit.gameObject.CompareTag(OverAllManager.TagNames.DroppableField))
             {
-                transform.position = hit.gameObject.transform.position;
-                _enable = false;
                 CardField cardField = hit.gameObject.GetComponent<CardField>();
+                transform.position = cardField.DropPos;
+                _rectTransform.SetAsLastSibling();
+                _enable = false;
                 cardField.PlusCard(this);
             }
             else if (hit.gameObject.CompareTag(OverAllManager.TagNames.CardDefaultField))

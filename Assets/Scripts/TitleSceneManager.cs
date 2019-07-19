@@ -9,12 +9,14 @@ public class TitleSceneManager : MonoBehaviour
 {
     [SerializeField] private GameObject _menu = null;
     [SerializeField] private GameObject _startPanel = null;
+    [SerializeField] private GameObject _playerSelectPanel = null;
     [SerializeField] private TMP_InputField _userNameInputField = null;
 
     private void Awake()
     {
         _menu.transform.localScale = Vector3.zero;
         _menu.SetActive(false);
+        _playerSelectPanel.SetActive(false);
     }
 
     private void Start()
@@ -39,6 +41,14 @@ public class TitleSceneManager : MonoBehaviour
         _menu.transform.DOScale(0f, 0.3f).OnComplete(() => _menu.SetActive(false));
     }
 
+    /// <summary>
+    /// データのリセット（デバッグ用）
+    /// </summary>
+    public void OnclickResetData()
+    {
+        OverAllManager.ResetData();
+    }
+
     public void OnclickInputText()
     {
         OverAllManager.SetUser(_userNameInputField.text);
@@ -46,12 +56,17 @@ public class TitleSceneManager : MonoBehaviour
         _startPanel.SetActive(false);
     }
 
+    public void OnclickOpenPlayerSelect()
+    {
+        _playerSelectPanel.SetActive(true);
+    }
+
     /// <summary>
     /// メインシーンに遷移
     /// </summary>
     public void MoveToMain()
     {
-        SceneManager.LoadSceneAsync("MainScene");
+        SceneManager.LoadSceneAsync(OverAllManager.SceneName.MainScene);
     }
 
     /// <summary>

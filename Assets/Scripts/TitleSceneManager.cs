@@ -7,21 +7,21 @@ using UnityEngine.SceneManagement;
 
 public class TitleSceneManager : MonoBehaviour
 {
-    [SerializeField] private GameObject _menu = null;
-    [SerializeField] private GameObject _startPanel = null;
-    [SerializeField] private GameObject _playerSelectPanel = null;
-    [SerializeField] private TMP_InputField _userNameInputField = null;
+    [SerializeField] private GameObject menu = null;
+    [SerializeField] private GameObject startPanel = null;
+    [SerializeField] private GameObject playerSelectPanel = null;
+    [SerializeField] private TMP_InputField userNameInputField = null;
 
     private void Awake()
     {
-        _menu.transform.localScale = Vector3.zero;
-        _menu.SetActive(false);
-        _playerSelectPanel.SetActive(false);
+        menu.transform.localScale = Vector3.zero;
+        menu.SetActive(false);
+        playerSelectPanel.SetActive(false);
     }
 
     private void Start()
     {
-        _startPanel.SetActive(OverAllManager.Count <= 0);
+        startPanel.SetActive(OverAllManager.Count <= 0);
     }
 
     /// <summary>
@@ -29,8 +29,8 @@ public class TitleSceneManager : MonoBehaviour
     /// </summary>
     public void OpenMenu()
     {
-        _menu.SetActive(true);
-        _menu.transform.DOScale(1f, 0.3f);
+        menu.SetActive(true);
+        menu.transform.DOScale(1f, 0.3f);
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class TitleSceneManager : MonoBehaviour
     /// </summary>
     public void CloseMenu()
     {
-        _menu.transform.DOScale(0f, 0.3f).OnComplete(() => _menu.SetActive(false));
+        menu.transform.DOScale(0f, 0.3f).OnComplete(() => menu.SetActive(false));
     }
 
     /// <summary>
@@ -51,14 +51,14 @@ public class TitleSceneManager : MonoBehaviour
 
     public void OnclickInputText()
     {
-        OverAllManager.SetUser(_userNameInputField.text);
-        _startPanel.transform.DOScale(0f, 0.3f);
-        _startPanel.SetActive(false);
+        OverAllManager.SetUser(userNameInputField.text);
+        startPanel.transform.DOScale(0f, 0.3f);
+        startPanel.SetActive(false);
     }
 
     public void OnclickOpenPlayerSelect()
     {
-        _playerSelectPanel.SetActive(true);
+        playerSelectPanel.SetActive(true);
     }
 
     /// <summary>

@@ -5,24 +5,24 @@ using UnityEngine;
 
 public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
 {
-    private static T instance;
+    private static T _instance;
 
     public static T Instance
     {
         get
         {
-            if (instance == null)
+            if (_instance == null)
             {
                 Type t = typeof(T);
 
-                instance = (T) FindObjectOfType(t);
-                if (instance == null)
+                _instance = (T) FindObjectOfType(t);
+                if (_instance == null)
                 {
                     Debug.LogError(t + " をアタッチしているGameObjectはありません");
                 }
             }
 
-            return instance;
+            return _instance;
         }
     }
 
@@ -36,9 +36,9 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
 
     protected bool CheckInstance()
     {
-        if (instance == null)
+        if (_instance == null)
         {
-            instance = this as T;
+            _instance = this as T;
             return true;
         }
         else if (Instance == this)

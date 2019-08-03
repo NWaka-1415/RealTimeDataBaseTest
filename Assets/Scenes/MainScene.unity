@@ -2011,13 +2011,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _myCards:
+  myCards:
   - {fileID: 1587011}
   - {fileID: 1214596035}
   - {fileID: 386835150}
   - {fileID: 255787251}
-  _cardField: {fileID: 637838590}
-  _playerNumber: 0
+  cardField: {fileID: 637838590}
+  playerNumber: 0
 --- !u!1001 &639487406
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2275,13 +2275,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23af36feaa332644db0c86f7eec00fb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _myCards:
+  myCards:
   - {fileID: 49977775}
   - {fileID: 791789073}
   - {fileID: 1121943043}
   - {fileID: 37644564}
-  _cardField: {fileID: 571996708}
-  _playerNumber: 0
+  cardField: {fileID: 571996708}
+  playerNumber: 0
 --- !u!1 &754434546
 GameObject:
   m_ObjectHideFlags: 0
@@ -3490,13 +3490,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _myCards:
+  myCards:
   - {fileID: 1214879603}
   - {fileID: 365161242}
   - {fileID: 1042095651}
   - {fileID: 182558232}
-  _cardField: {fileID: 1207270511}
-  _playerNumber: 0
+  cardField: {fileID: 1207270511}
+  playerNumber: 0
 --- !u!1001 &1214596033
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4126,13 +4126,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _myCards:
+  myCards:
   - {fileID: 1137193361}
   - {fileID: 1907704509}
   - {fileID: 1994368382}
   - {fileID: 2007749046}
-  _cardField: {fileID: 1447869870}
-  _playerNumber: 0
+  cardField: {fileID: 1447869870}
+  playerNumber: 0
 --- !u!1 &1470468225
 GameObject:
   m_ObjectHideFlags: 0
@@ -4619,13 +4619,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _myCards:
+  myCards:
   - {fileID: 1445438010}
   - {fileID: 1691989973}
   - {fileID: 1723491689}
   - {fileID: 284329371}
-  _cardField: {fileID: 1560645105}
-  _playerNumber: 0
+  cardField: {fileID: 1560645105}
+  playerNumber: 0
 --- !u!1001 &1587874891
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5751,13 +5751,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc87d1da89c5ee7438bdc9e4a77274fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _myCards:
+  myCards:
   - {fileID: 1587874893}
   - {fileID: 1777383690}
   - {fileID: 1546545559}
   - {fileID: 762591056}
-  _cardField: {fileID: 1931471330}
-  _playerNumber: 0
+  cardField: {fileID: 1931471330}
+  playerNumber: 0
 --- !u!1001 &1994368380
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5990,16 +5990,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94d276b8f0c0e6d4db48ab110712ab87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardField: {fileID: 571996708}
-  _bottomCard: {fileID: 1510396761}
-  _bottomChallenge: {fileID: 1741096287}
-  _challengeNumberText: {fileID: 1478458538}
-  _selectNumber: {fileID: 1590998317}
-  _challengeNumberSetSlider: {fileID: 1560215102}
-  _challengeButton: {fileID: 576003774}
-  _okButton: {fileID: 305335260}
-  _player: {fileID: 735145187}
-  _cpus:
+  bottomCard: {fileID: 1510396761}
+  bottomChallenge: {fileID: 1741096287}
+  challengeNumberText: {fileID: 1590998317}
+  selectNumber: {fileID: 1478458538}
+  challengeNumberSetSlider: {fileID: 1560215102}
+  challengeButton: {fileID: 576003774}
+  okButtonOnCards: {fileID: 305335260}
+  okButtonOnChallenge: {fileID: 207934879}
+  passButton: {fileID: 1599120501}
+  player: {fileID: 735145187}
+  cpus:
   - {fileID: 1931471331}
   - {fileID: 1560645106}
   - {fileID: 1447869871}

@@ -1027,7 +1027,7 @@ GameObject:
   - component: {fileID: 646690485}
   - component: {fileID: 646690484}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: StartPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2885,10 +2885,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b2c4aa0b4a93cc49a6fcac2cb862210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _menu: {fileID: 127351283}
-  _startPanel: {fileID: 646690482}
-  _playerSelectPanel: {fileID: 24057964}
-  _userNameInputField: {fileID: 9654757}
+  menu: {fileID: 127351283}
+  startPanel: {fileID: 646690482}
+  playerSelectPanel: {fileID: 24057964}
+  userNameInputField: {fileID: 9654757}
 --- !u!1 &1892261321
 GameObject:
   m_ObjectHideFlags: 0

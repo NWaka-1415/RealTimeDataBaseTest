@@ -9,7 +9,7 @@ public class CardField : MonoBehaviour
     /// <summary>
     /// 置かれているカード
     /// </summary>
-    [SerializeField] private Stack<Card> _cards;
+    [SerializeField] private Stack<Card> cards;
 
     /// <summary>
     /// 表 is Open
@@ -17,18 +17,15 @@ public class CardField : MonoBehaviour
     /// </summary>
     private OverAllManager.Card.States _fieldState = OverAllManager.Card.States.Open;
 
-    private OverAllManager.UserData _userData;
-
     private Vector3[] _dropPos;
 
     /// <summary>
     /// 初期化
     /// </summary>
     /// <param name="userData"></param>
-    public void Initialize(OverAllManager.UserData userData)
+    public void Initialize()
     {
-        _userData = userData;
-        _cards = new Stack<Card>();
+        cards = new Stack<Card>();
         _dropPos = new[]
         {
             transform.position + new Vector3(-10, -10),
@@ -45,7 +42,13 @@ public class CardField : MonoBehaviour
     {
         card.transform.position = this.gameObject.transform.position;
         card.Unselect(); //解除
-        _cards.Push(card);
+        cards.Push(card);
+        int index = 0;
+        foreach (Card card1 in cards)
+        {
+            card1.transform.position = _dropPos[index];
+        }
+
         DisableCards();
     }
 
@@ -54,14 +57,14 @@ public class CardField : MonoBehaviour
     /// </summary>
     private void DisableCards()
     {
-        foreach (Card card in _cards)
+        foreach (Card card in cards)
         {
             card.SetDisable();
         }
     }
 
     /// <summary>
-    /// プレイヤーがチャレンジに勝ったとき
+    /// チャレンジに勝ったとき
     /// </summary>
     public void GetPoint()
     {
@@ -73,8 +76,6 @@ public class CardField : MonoBehaviour
             case OverAllManager.Card.States.Close:
                 break;
         }
-
-        _userData.AddPoint();
     }
 
     /// <summary>
@@ -87,13 +88,13 @@ public class CardField : MonoBehaviour
         bool skull = false;
         for (int i = 0; i < number; i++)
         {
-            Card card = _cards.Pop();
+            Card card = cards.Pop();
             card.Open();
             if (card.CardType == OverAllManager.Card.CardTypes.Skull) skull = true;
         }
 
         return skull;
     }
-    
-    public Vector3 DropPos => _dropPos[_cards.Count];
+
+    public Vector3 DropPos => _dropPos[cards.Count];
 }

@@ -52,10 +52,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9635083cc5091a418e85fa76e2bc6d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _image: {fileID: 3902171872426221194}
-  _selectImage: {fileID: 3674371536244704705}
-  _button: {fileID: 5552048836210610273}
-  _rectTransform: {fileID: 3902171872426221192}
+  image: {fileID: 3902171872426221194}
+  selectImage: {fileID: 3674371536244704705}
+  button: {fileID: 5552048836210610273}
+  rectTransform: {fileID: 3902171872426221192}
 --- !u!222 &3902171872426221189
 CanvasRenderer:
   m_ObjectHideFlags: 0

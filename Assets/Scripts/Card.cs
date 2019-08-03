@@ -9,9 +9,9 @@ public class Card : MonoBehaviour
     private OverAllManager.Card _card;
     private Vector2 _defaultPos;
     private Player _player = null;
-    [SerializeField] private Image _image = null;
-    [SerializeField] private Image _selectImage = null;
-    [SerializeField] private Button _button = null;
+    [SerializeField] private Image image = null;
+    [SerializeField] private Image selectImage = null;
+    [SerializeField] private Button button = null;
     private bool _isSelected;
     private Sprite _frontSprite;
     private Sprite _backSprite;
@@ -32,7 +32,7 @@ public class Card : MonoBehaviour
     /// <summary>
     /// 短径トランスフォーム
     /// </summary>
-    [SerializeField] private RectTransform _rectTransform = null;
+    [SerializeField] private RectTransform rectTransform = null;
 
     /// <summary>
     /// コンストラクタ
@@ -47,14 +47,15 @@ public class Card : MonoBehaviour
     {
         _card = new OverAllManager.Card(cardType);
         _decided = false;
-        _selectImage.enabled = false;
+        selectImage.enabled = false;
         _isSelected = false;
         _frontSprite = front;
         _backSprite = back;
         _defaultPos = pos;
         _isYours = isYours;
-        if (_isYours) _button.onClick.AddListener(OnclickSelect);
-        _image.sprite = _isYours ? _frontSprite : _backSprite;
+        if (_isYours) button.onClick.AddListener(OnclickSelect);
+        else button.enabled = false;
+        image.sprite = _isYours ? _frontSprite : _backSprite;
     }
 
     /// <summary>
@@ -66,7 +67,7 @@ public class Card : MonoBehaviour
     /// <param name="isYours"></param>
     public void Initialize(OverAllManager.Card.CardTypes cardType, Sprite front, Sprite back, bool isYours = true)
     {
-        Initialize(_rectTransform.localPosition, cardType, front, back, isYours);
+        Initialize(rectTransform.localPosition, cardType, front, back, isYours);
     }
 
     /// <summary>
@@ -94,7 +95,7 @@ public class Card : MonoBehaviour
     {
         if(_decided) return;
         _isSelected = true;
-        _selectImage.enabled = _isSelected;
+        selectImage.enabled = _isSelected;
     }
 
     /// <summary>
@@ -104,7 +105,7 @@ public class Card : MonoBehaviour
     {
         if(_decided) return;
         _isSelected = false;
-        _selectImage.enabled = _isSelected;
+        selectImage.enabled = _isSelected;
     }
 
     /// <summary>

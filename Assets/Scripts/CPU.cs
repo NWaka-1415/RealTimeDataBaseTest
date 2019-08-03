@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class CPU : Player
 {
-    private int _flowerIndex = 0;
-
-    private void Start()
+    public override void Initialize(OverAllManager.UserData userData)
     {
-        SetCards(isYours: false);
+        SetUp(userData);
+        SetCards(false);
     }
 }

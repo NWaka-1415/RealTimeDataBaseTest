@@ -1,16 +1,16 @@
 fileFormatVersion: 2
-guid: a4f48dbf162405041959ba97e0271797
+guid: 24aa6d94ad53c724ebdfde8c2e0630b8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6110372836553530016
-    second: NewCharacter_NewPose_0
+      213: -8718089578280653514
+    second: Card_NewPose_0
   - first:
-      213: 6431589782292133436
-    second: NewCharacter_NewPose_1
+      213: -8332203486187827157
+    second: Card_NewPose_1
   - first:
-      213: -2100219125327906805
-    second: NewCharacter_NewPose_2
+      213: 6864875004798496406
+    second: Card_NewPose_2
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: NewCharacter_NewPose_0
+      name: Card_NewPose_0
       rect:
         serializedVersion: 2
         x: 80
-        y: 400
+        y: 395
         width: 160
-        height: 160
+        height: 170
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,20 +140,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 09708a3892cf4e84eaa241095ebec05f
-      internalID: -6110372836553530016
+      spriteID: be32a99eeabe43f48b93e4a4552f5ce1
+      internalID: -8718089578280653514
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: NewCharacter_NewPose_1
+      name: Card_NewPose_1
       rect:
         serializedVersion: 2
         x: 400
-        y: 400
+        y: 395
         width: 160
-        height: 160
+        height: 170
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -161,20 +161,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 91dee6bea087cf24bbe95fef4d77e169
-      internalID: 6431589782292133436
+      spriteID: 945451296670a6044be30612be710605
+      internalID: -8332203486187827157
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: NewCharacter_NewPose_2
+      name: Card_NewPose_2
       rect:
         serializedVersion: 2
         x: 80
-        y: 80
+        y: 75
         width: 160
-        height: 160
+        height: 170
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ed607293fb85348469b84e3ad3ecef9d
-      internalID: -2100219125327906805
+      spriteID: 7022cf68f5d793f41aefda779d4d17f2
+      internalID: 6864875004798496406
       vertices: []
       indices: 
       edges: []
@@ -191,7 +191,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: c1d4cbd48dd4de94d8d435777a219ab9
+    spriteID: 805175c3635522e41be8b57aab2ec447
     internalID: 0
     vertices: []
     indices: 

@@ -12,23 +12,22 @@ public class Player : MonoBehaviour
     [SerializeField] protected CardField cardField = null;
 
     protected Card selectCard;
+    private List<int> _throwCardIndex; //捨てられたカードのインデックス
     [SerializeField] protected int playerNumber = 0;
 
     protected OverAllManager.UserData userData;
 
     public virtual void Initialize(OverAllManager.UserData userData)
     {
-        SetUp(userData);
-        SetCards();
-    }
-
-    protected void SetUp(OverAllManager.UserData userData)
-    {
         this.userData = userData;
         cardField.Initialize();
     }
 
-    protected void SetCards(bool isYours = true)
+    /// <summary>
+    /// カードをセット
+    /// </summary>
+    /// <param name="isYours"></param>
+    public void SetCards(bool isYours = true)
     {
         int myCardSize = myCards.Length;
         for (int i = 0; i < myCardSize - 1; i++)
@@ -48,6 +47,11 @@ public class Player : MonoBehaviour
             new OverAllManager.Card(myCards[myCardSize - 1].CardType, myCards[myCardSize - 1].State);
     }
 
+    public void SetPlayerNumber(int playerNumber)
+    {
+        this.playerNumber = playerNumber;
+    }
+
     public void Select(Card card)
     {
         selectCard = card;
@@ -65,8 +69,10 @@ public class Player : MonoBehaviour
     /// </summary>
     public void Decide()
     {
+        if (selectCard == null) return;
         cardField.PlusCard(selectCard);
         GameSceneManager.Advance();
+        selectCard = null;
     }
 
     /// <summary>
@@ -74,7 +80,7 @@ public class Player : MonoBehaviour
     /// </summary>
     public void Challenge()
     {
-        GameSceneManager.SetChallenge();
+        GameSceneManager.SetChallenge(playerNumber);
     }
 
     /// <summary>
@@ -92,7 +98,19 @@ public class Player : MonoBehaviour
     /// </summary>
     public void ThrowAwayCard()
     {
-        float rand = Random.Range(0f, 1f);
+        bool loop = true;
+        int rand = 0;
+        while (loop)
+        {
+            rand = Random.Range(0, 3);
+            foreach (int index in _throwCardIndex)
+            {
+                loop = false;
+                if (index == rand) loop = true;
+            }
+        }
+
+        _throwCardIndex.Add(rand);
     }
 
     /// <summary>
@@ -102,6 +120,8 @@ public class Player : MonoBehaviour
     {
         GameSceneManager.Advance();
     }
+
+    public int PlayerNumber => playerNumber;
 
     public CardField CardField => cardField;
 }

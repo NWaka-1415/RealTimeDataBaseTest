@@ -12,6 +12,16 @@ public class GameSceneManager : MonoBehaviour
     private static int _activeUserNumber;
 
     /// <summary>
+    /// チャレンジ権を持つプレイヤーナンバー
+    /// </summary>
+    private static int _challengePlayerNumber;
+
+    /// <summary>
+    /// チャレンジを宣言したプレイヤーナンバー
+    /// </summary>
+    private static int _sayChallengePlayerNumber;
+
+    /// <summary>
     /// あなたのプレイヤーの番号
     /// Your player number
     /// </summary>
@@ -39,7 +49,7 @@ public class GameSceneManager : MonoBehaviour
 
     [SerializeField] private Button okButtonOnChallenge = null;
     [SerializeField] private Button passButton = null;
-        
+
     [SerializeField] private Player player = null;
 
     [SerializeField] private CPU[] cpus = new CPU[5];
@@ -52,16 +62,32 @@ public class GameSceneManager : MonoBehaviour
     /// </summary>
     private static bool _isChallenge;
 
+    private bool _prevChallenge;
+
     /// <summary>
     /// 宣言されているカード枚数
     /// </summary>
-    private int _flowerChallengeNumber;
+    private static int _flowerChallengeNumber;
+
+    /// <summary>
+    /// チャレンジできる最大カード枚数
+    /// </summary>
+    private static int _maxFlowerChallengeNumber;
+
+    /// <summary>
+    /// ターン間の待ち時間(CPU)
+    /// </summary>
+    private float _timeToTurnAndTurn;
 
     private void Awake()
     {
+        Initialize();
+        
         _activeUserNumber = 0;
         _turn = 0;
+        
         _isChallenge = false;
+        _prevChallenge = _isChallenge;
         challengeButton.interactable = false;
 
         //リソース読み込み
@@ -78,7 +104,7 @@ public class GameSceneManager : MonoBehaviour
             CardBackSprites[i] = cards[2];
             CardSkullSprites[i] = cards[1];
         }
-        
+
 //        _overAllManager = GameObject.FindWithTag(OverAllManager.TagNames.GameController).GetComponent<OverAllManager>();
         for (int i = OverAllManager.PlayerNumber - 1; i < cpus.Length; i++)
         {
@@ -87,34 +113,160 @@ public class GameSceneManager : MonoBehaviour
         }
 
         player.Initialize(OverAllManager.YourUserData);
-        for (int i = 0; i < OverAllManager.PlayerNumber; i++)
+        for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
         {
             cpus[i].Initialize(new OverAllManager.UserData($"hoge{i}", $"hoge{i}"));
         }
 
-        bottomCard.SetActive(true);
-        bottomChallenge.SetActive(false);
+        SetPlayer();
+        player.SetCards();
+        for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
+        {
+            cpus[i].SetCards(false);
+        }
 
         okButtonOnCards.onClick.AddListener(player.Decide);
+        challengeButton.onClick.AddListener(player.Challenge);
+
+        okButtonOnChallenge.onClick.AddListener(Select);
+        passButton.onClick.AddListener(player.Pass);
     }
 
     private void Update()
     {
-        if (_turn > 0) challengeButton.interactable = true;
         if (_isChallenge)
         {
-            selectNumber.text = $"{challengeNumberSetSlider.value}枚";
-        }
+            if (_activeUserNumber == _challengePlayerNumber)
+            {
+                //チャレンジ権利を持つプレイヤーに準場が回ってきた際
+                if (_activeUserNumber != 0)
+                {
+                    //CPUs
+                    
+                }
+            }
+            
+            if (_prevChallenge != _isChallenge)
+            {
+                Challenge();
+                _prevChallenge = _isChallenge;
+            }
 
-        okButtonOnCards.interactable = _activeUserNumber == 0;
+            //チャレンジした後の動作
+            //ボタンの無効化有効化
+            okButtonOnChallenge.interactable = _activeUserNumber == 0;
+            passButton.interactable = _activeUserNumber == 0;
+            challengeNumberSetSlider.interactable = _activeUserNumber == 0;
+            challengeNumberText.text = $"{challengeNumberSetSlider.value}枚";
+            if (_activeUserNumber != 0)
+            {
+                //CPUs
+                if (_timeToTurnAndTurn <= 0f)
+                {
+                    FindActiveCPU(_activeUserNumber).Thinking();
+                    selectNumber.text = $"{_flowerChallengeNumber}枚";
+                    SetSlider(1, _flowerChallengeNumber + 1, _maxFlowerChallengeNumber);
+                    _timeToTurnAndTurn = 1f;
+                }
+                else if (_timeToTurnAndTurn >= 1f)
+                {
+                    FindActiveCPU(_activeUserNumber).StartThinking();
+                    _timeToTurnAndTurn -= Time.deltaTime;
+                }
+                else
+                {
+                    _timeToTurnAndTurn -= Time.deltaTime;
+                }
+            }
+        }
+        else
+        {
+            //ボタンの無効化有効化
+            if (_turn > 0) challengeButton.interactable = _activeUserNumber == 0;
+            okButtonOnCards.interactable = (_activeUserNumber == 0) && (player.CardField.CardsCount < 4);
+            if (_activeUserNumber != 0)
+            {
+                //CPUs
+                if (_timeToTurnAndTurn <= 0f)
+                {
+                    FindActiveCPU(_activeUserNumber)?.Thinking();
+                    _timeToTurnAndTurn = 1f;
+                }
+                else if (_timeToTurnAndTurn >= 1f)
+                {
+                    FindActiveCPU(_activeUserNumber)?.StartThinking();
+                    _timeToTurnAndTurn -= Time.deltaTime;
+                }
+                else
+                {
+                    _timeToTurnAndTurn -= Time.deltaTime;
+                }
+            }
+        }
     }
 
-    public static void SetChallenge()
+    private void Initialize()
+    {
+        _timeToTurnAndTurn = 1f;
+        _flowerChallengeNumber = 0;
+        _challengePlayerNumber = -1;
+        bottomCard.SetActive(true);
+        bottomChallenge.SetActive(false);
+    }
+
+    private void SetPlayer()
+    {
+        switch (OverAllManager.PlayerNumber)
+        {
+            //どの場合もPlayerが0番
+            default:
+                //3人想定
+                cpus[1].SetPlayerNumber(1);
+                cpus[0].SetPlayerNumber(2);
+                break;
+            case 4:
+                cpus[1].SetPlayerNumber(1);
+                cpus[2].SetPlayerNumber(2);
+                cpus[0].SetPlayerNumber(3);
+                break;
+            case 5:
+                cpus[1].SetPlayerNumber(1);
+                cpus[2].SetPlayerNumber(2);
+                cpus[3].SetPlayerNumber(3);
+                cpus[0].SetPlayerNumber(4);
+                break;
+            case 6:
+                cpus[1].SetPlayerNumber(1);
+                cpus[4].SetPlayerNumber(2);
+                cpus[2].SetPlayerNumber(3);
+                cpus[3].SetPlayerNumber(4);
+                cpus[0].SetPlayerNumber(5);
+                break;
+        }
+    }
+
+    private CPU FindActiveCPU(int activeNumber)
+    {
+        foreach (CPU cpu in cpus)
+        {
+            if (cpu.PlayerNumber == activeNumber) return cpu;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// チャレンジ状態にする
+    /// </summary>
+    public static void SetChallenge(int playerNumber)
     {
         if (_turn < 1) return;
         _isChallenge = true;
     }
 
+    /// <summary>
+    /// 自分の手番を終える
+    /// </summary>
     public static void Advance()
     {
         _activeUserNumber++;
@@ -126,7 +278,7 @@ public class GameSceneManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ターン
+    /// ターンを進める
     /// </summary>
     private static void AdvanceTurn()
     {
@@ -140,12 +292,18 @@ public class GameSceneManager : MonoBehaviour
     /// <summary>
     /// チャレンジを押した際
     /// </summary>
-    public void Challenge()
+    private void Challenge()
     {
-        _isChallenge = true;
-        bottomCard.SetActive(false);
         bottomChallenge.SetActive(true);
-        SetSlider(1, 1, 6);
+        int cardCount = player.CardField.CardsCount;
+        for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
+        {
+            cardCount += cpus[i].CardField.CardsCount;
+        }
+
+        _maxFlowerChallengeNumber = cardCount;
+
+        SetSlider(1, 1, cardCount);
     }
 
     /*
@@ -154,11 +312,21 @@ public class GameSceneManager : MonoBehaviour
 
     /// <summary>
     /// 決めたチャレンジ枚数をセット
+    /// Player用
     /// </summary>
     public void Select()
     {
         _flowerChallengeNumber = (int) challengeNumberSetSlider.value;
-        challengeNumberText.text = $"{_flowerChallengeNumber}枚";
+        selectNumber.text = $"{_flowerChallengeNumber}枚";
+        SetSlider(1, _flowerChallengeNumber + 1, _maxFlowerChallengeNumber);
+        _challengePlayerNumber = 0;
+        Advance();
+    }
+
+    public static void SetChallengeNumber(int flowerChallengeNumber,int playerNumber)
+    {
+        _flowerChallengeNumber = flowerChallengeNumber;
+        _challengePlayerNumber = playerNumber;
     }
 
     /// <summary>
@@ -173,4 +341,12 @@ public class GameSceneManager : MonoBehaviour
         challengeNumberSetSlider.minValue = minValue;
         challengeNumberSetSlider.maxValue = maxValue;
     }
+
+    public static int Turn => _turn;
+
+    public static bool IsChallenge => _isChallenge;
+
+    public static int FlowerChallengeNumber => _flowerChallengeNumber;
+
+    public static int MaxFlowerChallengeNumber => _maxFlowerChallengeNumber;
 }

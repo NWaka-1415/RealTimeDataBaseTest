@@ -1,16 +1,16 @@
 fileFormatVersion: 2
-guid: a6a7d290d0d304848a0d9f981eceb2a5
+guid: f209af124f0115b4695758b15a47f8c3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2887483155719835220
-    second: NewCharacter_NewPose_4_0
+      213: 6436418850254840857
+    second: Card_NewPose_4_0
   - first:
-      213: 9150663970925052661
-    second: NewCharacter_NewPose_4_1
+      213: 4037714684682356281
+    second: Card_NewPose_4_1
   - first:
-      213: 3591225403476182072
-    second: NewCharacter_NewPose_4_2
+      213: -5163588630101509469
+    second: Card_NewPose_4_2
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: NewCharacter_NewPose_4_0
+      name: Card_NewPose_4_0
       rect:
         serializedVersion: 2
         x: 80
-        y: 400
+        y: 395
         width: 160
-        height: 160
+        height: 170
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -140,20 +140,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5564b27b9d53c0a459ae5667b223bd89
-      internalID: 2887483155719835220
+      spriteID: 1227c0f8cf41027438e09183c0b0ebe2
+      internalID: 6436418850254840857
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: NewCharacter_NewPose_4_1
+      name: Card_NewPose_4_1
       rect:
         serializedVersion: 2
         x: 400
-        y: 400
+        y: 395
         width: 160
-        height: 160
+        height: 170
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -161,20 +161,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2060bde7c0d493749a2c07468a96ec7e
-      internalID: 9150663970925052661
+      spriteID: 0942263c5729bdc4583a99bec5974365
+      internalID: 4037714684682356281
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: NewCharacter_NewPose_4_2
+      name: Card_NewPose_4_2
       rect:
         serializedVersion: 2
         x: 80
-        y: 80
+        y: 75
         width: 160
-        height: 160
+        height: 170
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e7ebb5bfa51027e47aedd12224a7c25a
-      internalID: 3591225403476182072
+      spriteID: 930137b9c93d5dc4d803a7f8eaa90813
+      internalID: -5163588630101509469
       vertices: []
       indices: 
       edges: []
@@ -191,7 +191,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 35818c505d8cca64886b19d1c2babea5
+    spriteID: e95c4c08e7f70fb42a01599edba53b15
     internalID: 0
     vertices: []
     indices: 

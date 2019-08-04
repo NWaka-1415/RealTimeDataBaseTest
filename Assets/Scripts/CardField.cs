@@ -26,12 +26,13 @@ public class CardField : MonoBehaviour
     public void Initialize()
     {
         cards = new Stack<Card>();
+        Vector3 position = transform.position;
         _dropPos = new[]
         {
-            transform.position + new Vector3(-10, -10),
-            transform.position + new Vector3(-5, -5),
-            transform.position,
-            transform.position + new Vector3(5, 5)
+            position + new Vector3(-10, -10),
+            position + new Vector3(-5, -5),
+            position,
+            position + new Vector3(5, 5)
         };
     }
 
@@ -40,13 +41,17 @@ public class CardField : MonoBehaviour
     /// </summary>
     public void PlusCard(Card card)
     {
+        card.gameObject.SetActive(true);
         card.transform.position = this.gameObject.transform.position;
         card.Unselect(); //解除
         cards.Push(card);
+
         int index = 0;
         foreach (Card card1 in cards)
         {
+            card1.transform.SetSiblingIndex(index);
             card1.transform.position = _dropPos[index];
+            index++;
         }
 
         DisableCards();
@@ -97,4 +102,6 @@ public class CardField : MonoBehaviour
     }
 
     public Vector3 DropPos => _dropPos[cards.Count];
+
+    public int CardsCount => cards.Count;
 }

@@ -17,6 +17,11 @@ public class Card : MonoBehaviour
     private Sprite _backSprite;
 
     /// <summary>
+    /// 捨てられたカードかどうか
+    /// </summary>
+    private bool _isThrow;
+
+    /// <summary>
     /// 決定されたカードか否か
     /// true:決定済み
     /// </summary>
@@ -42,8 +47,9 @@ public class Card : MonoBehaviour
     /// <param name="back"></param>
     /// <param name="front"></param>
     /// <param name="isYours"></param>
+    /// <param name="isThrow"></param>
     public void Initialize(Vector2 pos, OverAllManager.Card.CardTypes cardType, Sprite front, Sprite back,
-        bool isYours = true)
+        bool isYours = true, bool isThrow = false)
     {
         _card = new OverAllManager.Card(cardType);
         _decided = false;
@@ -53,8 +59,14 @@ public class Card : MonoBehaviour
         _backSprite = back;
         _defaultPos = pos;
         _isYours = isYours;
+        _isThrow = isThrow;
         if (_isYours) button.onClick.AddListener(OnclickSelect);
-        else button.enabled = false;
+        else
+        {
+            button.enabled = false;
+            this.gameObject.SetActive(false);
+        }
+
         image.sprite = _isYours ? _frontSprite : _backSprite;
     }
 
@@ -65,9 +77,11 @@ public class Card : MonoBehaviour
     /// <param name="back"></param>
     /// <param name="front"></param>
     /// <param name="isYours"></param>
-    public void Initialize(OverAllManager.Card.CardTypes cardType, Sprite front, Sprite back, bool isYours = true)
+    /// <param name="isThrow"></param>
+    public void Initialize(OverAllManager.Card.CardTypes cardType, Sprite front, Sprite back, bool isYours = true,
+        bool isThrow = false)
     {
-        Initialize(rectTransform.localPosition, cardType, front, back, isYours);
+        Initialize(rectTransform.localPosition, cardType, front, back, isYours, isThrow);
     }
 
     /// <summary>
@@ -85,6 +99,7 @@ public class Card : MonoBehaviour
     /// </summary>
     public void OnclickSelect()
     {
+        if(_decided) return;
         _player.Select(this);
     }
 
@@ -93,7 +108,7 @@ public class Card : MonoBehaviour
     /// </summary>
     public void Select()
     {
-        if(_decided) return;
+        if (_decided) return;
         _isSelected = true;
         selectImage.enabled = _isSelected;
     }
@@ -103,7 +118,7 @@ public class Card : MonoBehaviour
     /// </summary>
     public void Unselect()
     {
-        if(_decided) return;
+        if (_decided) return;
         _isSelected = false;
         selectImage.enabled = _isSelected;
     }
@@ -135,4 +150,6 @@ public class Card : MonoBehaviour
     public OverAllManager.Card.States State => _card.State;
 
     public OverAllManager.Card.CardTypes CardType => _card.CardType;
+
+    public bool Decided => _decided;
 }

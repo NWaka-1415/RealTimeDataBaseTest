@@ -85,22 +85,24 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         /// <summary>
         /// ユーザーの名前
         /// </summary>
-        [SerializeField] private string _username;
+        [SerializeField] private string username;
 
         /// <summary>
         /// ユーザーId
         /// </summary>
-        [SerializeField] private string _userId;
+        [SerializeField] private string userId;
 
         /// <summary>
         /// 所持しているカード
         /// 計4枚からスタート
         /// </summary>
-        [SerializeField] private Card[] _havingCards = new Card[4];
+        [SerializeField] private Card[] havingCards = new Card[4];
 
-        [SerializeField] private int _point;
+        [SerializeField] private int point;
 
-        [SerializeField] private bool _isActive;
+        [SerializeField] private bool isActive;
+
+        [SerializeField] private int selectCardIndex;
 
         /// <summary>
         /// コンストラクタ
@@ -109,20 +111,20 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         /// <param name="json"></param>
         public UserData(string username, string userId)
         {
-            _username = username;
-            _userId = userId;
-            _point = 2;
-            for (int i = 0; i < _havingCards.Length - 1; i++)
+            this.username = username;
+            this.userId = userId;
+            point = 2;
+            for (int i = 0; i < havingCards.Length - 1; i++)
             {
-                _havingCards[i] = new Card(Card.CardTypes.Flower);
+                havingCards[i] = new Card(Card.CardTypes.Flower);
             }
 
-            _havingCards[3] = new Card(Card.CardTypes.Skull);
+            havingCards[3] = new Card(Card.CardTypes.Skull);
         }
 
         public void SetUserName(string userName)
         {
-            _username = userName;
+            username = userName;
         }
 
         /// <summary>
@@ -130,10 +132,17 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
         /// </summary>
         public void AddPoint()
         {
-            _point++;
+            point++;
         }
 
-        public int Point => _point;
+        public void SetSelectCardIndex(int index)
+        {
+            selectCardIndex = index;
+        }
+
+        public int Point => point;
+
+        public int SelectCardIndex => selectCardIndex;
 
         /// <summary>
         /// 自分自身のJson形式を返却
@@ -144,11 +153,11 @@ public class OverAllManager : SingletonMonoBehaviour<OverAllManager>
             return JsonUtility.ToJson(this);
         }
 
-        public string Username => _username;
+        public string Username => username;
 
-        public string UserId => _userId;
+        public string UserId => userId;
 
-        public Card[] HavingCards => _havingCards;
+        public Card[] HavingCards => havingCards;
 
         public static UserData CreateUserDataFromJson(string json)
         {

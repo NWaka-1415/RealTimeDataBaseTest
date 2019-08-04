@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Player : MonoBehaviour
 {
@@ -11,16 +14,55 @@ public class Player : MonoBehaviour
 
     [SerializeField] protected CardField cardField = null;
 
+    [SerializeField] private Text pointText = null;
+
     protected Card selectCard;
-    private List<int> _throwCardIndex; //捨てられたカードのインデックス
+    protected CardField selectCardField;
+
     [SerializeField] protected int playerNumber = 0;
 
     protected OverAllManager.UserData userData;
 
+    protected int point = 0;
+
+    /// <summary>
+    /// スカルが出たか
+    /// </summary>
+    protected bool isOut;
+
+    /// <summary>
+    /// 最終フェーズでカードをすべてめくったか
+    /// </summary>
+    /// <returns></returns>
+    protected bool isClear;
+
+    protected float time;
+
     public virtual void Initialize(OverAllManager.UserData userData)
     {
         this.userData = userData;
+        point = 0;
+        time = 1f;
+        isOut = false;
+        isClear = false;
+        selectCard = null;
+        selectCardField = null;
         cardField.Initialize();
+        cardField.SetParent(this);
+    }
+
+    public virtual void ResetThis()
+    {
+        time = 1f;
+        isOut = false;
+        isClear = false;
+        selectCard = null;
+        selectCardField = null;
+        cardField.ResetThis();
+        foreach (Card myCard in myCards)
+        {
+            myCard.ResetCard();
+        }
     }
 
     /// <summary>
@@ -52,7 +94,7 @@ public class Player : MonoBehaviour
         this.playerNumber = playerNumber;
     }
 
-    public void Select(Card card)
+    public void SelectCard(Card card)
     {
         selectCard = card;
         foreach (Card myCard in myCards)
@@ -64,15 +106,71 @@ public class Player : MonoBehaviour
 //        Debug.Log($"Select:{_selectCard}");
     }
 
+    public void SelectField(CardField cardField)
+    {
+        if (cardField.CardsCount <= 0) return;
+        selectCardField = cardField;
+        foreach (CardField field in GameSceneManager.CardFields)
+        {
+            field.Unselect();
+        }
+
+        selectCardField.Select();
+        DecideOpenCard();
+    }
+
     /// <summary>
     /// 場に出すカードを決定
     /// </summary>
-    public void Decide()
+    public void DecideSetCard()
     {
         if (selectCard == null) return;
         cardField.PlusCard(selectCard);
         GameSceneManager.Advance();
         selectCard = null;
+    }
+
+    /// <summary>
+    /// どこのカードを選ぶか決定
+    /// </summary>
+    public void DecideOpenCard()
+    {
+        if (selectCardField == null) return;
+        Card openCard = selectCardField.SelectField();
+        GameSceneManager.OpenedCardsNumber++;
+        if (openCard.CardType == OverAllManager.Card.CardTypes.Skull)
+        {
+            //スカルを選んだらアウト！
+            StartCoroutine(Wait(1.5f, (() =>
+            {
+                isOut = true;
+                StartCoroutine(Wait(1.0f, (ThrowAwayCard)));
+            })));
+        }
+        else
+        {
+            if (GameSceneManager.OpenedCardsNumber >= GameSceneManager.FlowerChallengeNumber)
+            {
+                //クリア！
+                Debug.Log("Nice!");
+                StartCoroutine(Wait(1.5f, (GetPoint)));
+            }
+        }
+
+        selectCardField = null;
+    }
+
+    /// <summary>
+    /// 自分が権利者の場合はまずは自分のカードをすべてオープン
+    /// </summary>
+    public void OpenAllMyCards()
+    {
+        for (int i = 0; i < cardField.CardsCount; i++)
+        {
+            selectCardField = cardField;
+            DecideOpenCard();
+            if (isOut) break;
+        }
     }
 
     /// <summary>
@@ -88,8 +186,10 @@ public class Player : MonoBehaviour
     /// </summary>
     public void GetPoint()
     {
-        userData.AddPoint();
+        point++;
         cardField.GetPoint();
+        pointText.text = $"{point} / 2";
+        isClear = true;
     }
 
     /// <summary>
@@ -103,14 +203,11 @@ public class Player : MonoBehaviour
         while (loop)
         {
             rand = Random.Range(0, 3);
-            foreach (int index in _throwCardIndex)
-            {
-                loop = false;
-                if (index == rand) loop = true;
-            }
+            loop = false;
+            if (myCards[rand].IsThrow) loop = true;
         }
 
-        _throwCardIndex.Add(rand);
+        myCards[rand].ThrowAway();
     }
 
     /// <summary>
@@ -121,7 +218,17 @@ public class Player : MonoBehaviour
         GameSceneManager.Advance();
     }
 
+    IEnumerator Wait(float waitTimeSec, Action action)
+    {
+        yield return new WaitForSeconds(waitTimeSec);
+        action();
+    }
+
     public int PlayerNumber => playerNumber;
 
     public CardField CardField => cardField;
+
+    public bool IsOut => isOut;
+
+    public bool IsClear => isClear;
 }

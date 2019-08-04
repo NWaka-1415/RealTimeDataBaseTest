@@ -17,7 +17,26 @@ public class CardField : MonoBehaviour
     /// </summary>
     private OverAllManager.Card.States _fieldState = OverAllManager.Card.States.Open;
 
+    /// <summary>
+    /// カードを置く位置
+    /// </summary>
     private Vector3[] _dropPos;
+
+    /// <summary>
+    /// カードを開いた後に置く位置
+    /// </summary>
+    private Vector3[] _openPos;
+
+    /// <summary>
+    /// 開いているカードの数
+    /// </summary>
+    private int _openNumber;
+
+    private Player _player;
+
+    private Player _parent;
+
+    private bool _isSelect;
 
     /// <summary>
     /// 初期化
@@ -26,7 +45,9 @@ public class CardField : MonoBehaviour
     public void Initialize()
     {
         cards = new Stack<Card>();
+        _openNumber = 0;
         Vector3 position = transform.position;
+        _isSelect = false;
         _dropPos = new[]
         {
             position + new Vector3(-10, -10),
@@ -34,6 +55,40 @@ public class CardField : MonoBehaviour
             position,
             position + new Vector3(5, 5)
         };
+        _openPos = new[]
+        {
+            position + new Vector3(10f, 20f),
+            position + new Vector3(10f, 5f),
+            position + new Vector3(10f, -10f),
+            position + new Vector3(10f, -25f)
+        };
+    }
+
+    public void ResetThis()
+    {
+        cards = new Stack<Card>();
+        _openNumber = 0;
+        _isSelect = false;
+    }
+
+    public void SetPlayer(Player player)
+    {
+        _player = player;
+    }
+
+    public void SetParent(Player parent)
+    {
+        _parent = parent;
+    }
+
+    public void Select()
+    {
+        _isSelect = true;
+    }
+
+    public void Unselect()
+    {
+        _isSelect = false;
     }
 
     /// <summary>
@@ -46,8 +101,14 @@ public class CardField : MonoBehaviour
         card.Unselect(); //解除
         cards.Push(card);
 
+        Stack<Card> cardsTmp = new Stack<Card>();
         int index = 0;
         foreach (Card card1 in cards)
+        {
+            cardsTmp.Push(cards.Peek());
+        }
+
+        foreach (Card card1 in cardsTmp)
         {
             card1.transform.SetSiblingIndex(index);
             card1.transform.position = _dropPos[index];
@@ -83,22 +144,21 @@ public class CardField : MonoBehaviour
         }
     }
 
+    public void OnclickSelect()
+    {
+        _player.SelectField(this);
+    }
+
     /// <summary>
     /// Challengeによってフィールドが選択されたとき
-    /// そのフィールド上のカードは全部表にされる
-    /// ついでにスカルが含まれていないかを返却
     /// </summary>
-    public bool SelectField(int number)
+    public Card SelectField()
     {
-        bool skull = false;
-        for (int i = 0; i < number; i++)
-        {
-            Card card = cards.Pop();
-            card.Open();
-            if (card.CardType == OverAllManager.Card.CardTypes.Skull) skull = true;
-        }
-
-        return skull;
+        Card card = cards.Pop();
+        card.Open();
+        card.transform.position = _openPos[_openNumber];
+        _openNumber++;
+        return card;
     }
 
     public Vector3 DropPos => _dropPos[cards.Count];

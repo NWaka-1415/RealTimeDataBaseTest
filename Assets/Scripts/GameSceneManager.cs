@@ -5,6 +5,13 @@ using UnityEngine.UI;
 
 public class GameSceneManager : MonoBehaviour
 {
+    public enum GameModeTypes
+    {
+        PushCardMode, //初期。場にカードを出す
+        SelectChallengeNumberMode, //チャレンジ開始！何枚花のカードがあるかを決める
+        SelectCardFromOtherPlayerMode //数が決まったらドクロを選ばないようにカードを選ぶ
+    }
+
     /// <summary>
     /// 現在行動可能なプレイヤーの番号
     /// Player number which is able to action
@@ -39,6 +46,7 @@ public class GameSceneManager : MonoBehaviour
 
     [SerializeField] private GameObject bottomCard = null;
     [SerializeField] private GameObject bottomChallenge = null;
+    [SerializeField] private GameObject bottomSelectField = null;
 
     [SerializeField] private Text challengeNumberText = null;
     [SerializeField] private Text selectNumber = null;
@@ -50,19 +58,21 @@ public class GameSceneManager : MonoBehaviour
     [SerializeField] private Button okButtonOnChallenge = null;
     [SerializeField] private Button passButton = null;
 
+    [SerializeField] private Text selectCardNumberText = null;
+    [SerializeField] private Button okButtonOnSelectCard = null;
+
     [SerializeField] private Player player = null;
 
     [SerializeField] private CPU[] cpus = new CPU[5];
 
-    /// <summary>
-    /// チャレンジのターンか
-    /// Is the turn challenge turn?
-    /// Yes=>true
-    /// No=>false
-    /// </summary>
-    private static bool _isChallenge;
+    private static List<CardField> _cardFields = new List<CardField>();
 
-    private bool _prevChallenge;
+    /// <summary>
+    /// 今ゲームはどの場面か
+    /// </summary>
+    private static GameModeTypes _gameModeType;
+
+    private GameModeTypes _prevGameModeType;
 
     /// <summary>
     /// 宣言されているカード枚数
@@ -75,6 +85,11 @@ public class GameSceneManager : MonoBehaviour
     private static int _maxFlowerChallengeNumber;
 
     /// <summary>
+    /// 展開されているカードの枚数
+    /// </summary>
+    private static int _openedCardsNumber;
+
+    /// <summary>
     /// ターン間の待ち時間(CPU)
     /// </summary>
     private float _timeToTurnAndTurn;
@@ -82,12 +97,10 @@ public class GameSceneManager : MonoBehaviour
     private void Awake()
     {
         Initialize();
-        
+
         _activeUserNumber = 0;
         _turn = 0;
-        
-        _isChallenge = false;
-        _prevChallenge = _isChallenge;
+
         challengeButton.interactable = false;
 
         //リソース読み込み
@@ -115,103 +128,166 @@ public class GameSceneManager : MonoBehaviour
         player.Initialize(OverAllManager.YourUserData);
         for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
         {
-            cpus[i].Initialize(new OverAllManager.UserData($"hoge{i}", $"hoge{i}"));
+            cpus[i].Initialize(new OverAllManager.UserData($"hoge{i}", $"hoge{i}"), player);
         }
 
         SetPlayer();
         player.SetCards();
+        _cardFields.Add(player.CardField);
         for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
         {
             cpus[i].SetCards(false);
+            _cardFields.Add(cpus[i].CardField);
         }
 
-        okButtonOnCards.onClick.AddListener(player.Decide);
+        okButtonOnCards.onClick.AddListener(player.DecideSetCard);
         challengeButton.onClick.AddListener(player.Challenge);
 
         okButtonOnChallenge.onClick.AddListener(Select);
         passButton.onClick.AddListener(player.Pass);
+
+        okButtonOnSelectCard.onClick.AddListener(player.DecideOpenCard);
+        okButtonOnSelectCard.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (_isChallenge)
+        switch (_gameModeType)
         {
-            if (_activeUserNumber == _challengePlayerNumber)
-            {
-                //チャレンジ権利を持つプレイヤーに準場が回ってきた際
+            case GameModeTypes.PushCardMode:
+                //ボタンの無効化有効化
+                if (_turn > 0) challengeButton.interactable = _activeUserNumber == 0;
+                okButtonOnCards.interactable = (_activeUserNumber == 0) && (player.CardField.CardsCount < 4);
                 if (_activeUserNumber != 0)
                 {
                     //CPUs
-                    
+                    if (_timeToTurnAndTurn <= 0f)
+                    {
+                        FindActiveCPU(_activeUserNumber)?.Thinking();
+                        _timeToTurnAndTurn = 1f;
+                    }
+                    else if (_timeToTurnAndTurn >= 1f)
+                    {
+                        FindActiveCPU(_activeUserNumber)?.StartThinking();
+                        _timeToTurnAndTurn -= Time.deltaTime;
+                    }
+                    else
+                    {
+                        _timeToTurnAndTurn -= Time.deltaTime;
+                    }
                 }
-            }
-            
-            if (_prevChallenge != _isChallenge)
-            {
-                Challenge();
-                _prevChallenge = _isChallenge;
-            }
 
-            //チャレンジした後の動作
-            //ボタンの無効化有効化
-            okButtonOnChallenge.interactable = _activeUserNumber == 0;
-            passButton.interactable = _activeUserNumber == 0;
-            challengeNumberSetSlider.interactable = _activeUserNumber == 0;
-            challengeNumberText.text = $"{challengeNumberSetSlider.value}枚";
-            if (_activeUserNumber != 0)
-            {
-                //CPUs
-                if (_timeToTurnAndTurn <= 0f)
+                break;
+            case GameModeTypes.SelectChallengeNumberMode:
+                Debug.Log($"act:{_activeUserNumber}\nchallenge:{_challengePlayerNumber}");
+                if (_activeUserNumber == _challengePlayerNumber)
                 {
-                    FindActiveCPU(_activeUserNumber).Thinking();
-                    selectNumber.text = $"{_flowerChallengeNumber}枚";
-                    SetSlider(1, _flowerChallengeNumber + 1, _maxFlowerChallengeNumber);
-                    _timeToTurnAndTurn = 1f;
+                    _gameModeType = GameModeTypes.SelectCardFromOtherPlayerMode;
+                    for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
+                    {
+                        cpus[i].SetSelectThisButton();
+                    }
+
+                    break;
                 }
-                else if (_timeToTurnAndTurn >= 1f)
+
+                if (_prevGameModeType != _gameModeType && _gameModeType == GameModeTypes.SelectChallengeNumberMode)
                 {
-                    FindActiveCPU(_activeUserNumber).StartThinking();
-                    _timeToTurnAndTurn -= Time.deltaTime;
+                    Challenge();
+                    _prevGameModeType = _gameModeType;
+                }
+
+                //チャレンジした後の動作
+                //ボタンの無効化有効化
+                okButtonOnChallenge.interactable = _activeUserNumber == 0;
+                passButton.interactable = _activeUserNumber == 0;
+                challengeNumberSetSlider.interactable = _activeUserNumber == 0;
+                challengeNumberText.text = $"{challengeNumberSetSlider.value}枚";
+                if (_activeUserNumber != 0)
+                {
+                    //CPUs
+                    if (_timeToTurnAndTurn <= 0f)
+                    {
+                        FindActiveCPU(_activeUserNumber).Thinking();
+                        selectNumber.text = $"{_flowerChallengeNumber}枚";
+                        SetSlider(1, _flowerChallengeNumber + 1, _maxFlowerChallengeNumber);
+                        _timeToTurnAndTurn = 1f;
+                    }
+                    else if (_timeToTurnAndTurn >= 1f)
+                    {
+                        FindActiveCPU(_activeUserNumber).StartThinking();
+                        _timeToTurnAndTurn -= Time.deltaTime;
+                    }
+                    else
+                    {
+                        _timeToTurnAndTurn -= Time.deltaTime;
+                    }
+                }
+
+                break;
+            case GameModeTypes.SelectCardFromOtherPlayerMode:
+                //チャレンジ権利を持つプレイヤーに準場が回ってきた際
+                bottomChallenge.SetActive(false);
+                bottomSelectField.SetActive(true);
+
+                okButtonOnSelectCard.interactable = _activeUserNumber == 0;
+                selectCardNumberText.text = $"{_openedCardsNumber} / {_flowerChallengeNumber}枚";
+
+                if (_activeUserNumber != 0)
+                {
+                    //CPUs
+                    if (_timeToTurnAndTurn <= 0f)
+                    {
+                        FindActiveCPU(_activeUserNumber).Thinking();
+                        selectCardNumberText.text = $"{_openedCardsNumber} / {_flowerChallengeNumber}枚";
+                        _timeToTurnAndTurn = 1f;
+                    }
+                    else if (_timeToTurnAndTurn >= 1f)
+                    {
+                        FindActiveCPU(_activeUserNumber).StartThinking();
+                        _timeToTurnAndTurn -= Time.deltaTime;
+                    }
+                    else
+                    {
+                        _timeToTurnAndTurn -= Time.deltaTime;
+                    }
                 }
                 else
                 {
-                    _timeToTurnAndTurn -= Time.deltaTime;
+                    if (player.IsClear || player.IsOut)
+                    {
+                        //スカルが出たか、ポイントを取ったら終了
+                        player.ResetThis();
+                        for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
+                        {
+                            cpus[i].ResetThis();
+                        }
+
+                        Initialize();
+
+                        break;
+                    }
+
+                    player.OpenAllMyCards();
+                    selectCardNumberText.text = $"{_openedCardsNumber} / {_flowerChallengeNumber}枚";
                 }
-            }
-        }
-        else
-        {
-            //ボタンの無効化有効化
-            if (_turn > 0) challengeButton.interactable = _activeUserNumber == 0;
-            okButtonOnCards.interactable = (_activeUserNumber == 0) && (player.CardField.CardsCount < 4);
-            if (_activeUserNumber != 0)
-            {
-                //CPUs
-                if (_timeToTurnAndTurn <= 0f)
-                {
-                    FindActiveCPU(_activeUserNumber)?.Thinking();
-                    _timeToTurnAndTurn = 1f;
-                }
-                else if (_timeToTurnAndTurn >= 1f)
-                {
-                    FindActiveCPU(_activeUserNumber)?.StartThinking();
-                    _timeToTurnAndTurn -= Time.deltaTime;
-                }
-                else
-                {
-                    _timeToTurnAndTurn -= Time.deltaTime;
-                }
-            }
+
+                break;
         }
     }
 
     private void Initialize()
     {
+        _turn = 0;
         _timeToTurnAndTurn = 1f;
         _flowerChallengeNumber = 0;
         _challengePlayerNumber = -1;
+        _openedCardsNumber = 0;
+        _gameModeType = GameModeTypes.PushCardMode;
+        _prevGameModeType = _gameModeType;
         bottomCard.SetActive(true);
         bottomChallenge.SetActive(false);
+        bottomSelectField.SetActive(false);
     }
 
     private void SetPlayer()
@@ -261,7 +337,8 @@ public class GameSceneManager : MonoBehaviour
     public static void SetChallenge(int playerNumber)
     {
         if (_turn < 1) return;
-        _isChallenge = true;
+        _sayChallengePlayerNumber = playerNumber;
+        _gameModeType = GameModeTypes.SelectChallengeNumberMode;
     }
 
     /// <summary>
@@ -318,12 +395,20 @@ public class GameSceneManager : MonoBehaviour
     {
         _flowerChallengeNumber = (int) challengeNumberSetSlider.value;
         selectNumber.text = $"{_flowerChallengeNumber}枚";
-        SetSlider(1, _flowerChallengeNumber + 1, _maxFlowerChallengeNumber);
+        int minValue = _flowerChallengeNumber + 1;
+        if (minValue >= _maxFlowerChallengeNumber) minValue = _maxFlowerChallengeNumber;
+        SetSlider(1, minValue, _maxFlowerChallengeNumber);
         _challengePlayerNumber = 0;
         Advance();
     }
 
-    public static void SetChallengeNumber(int flowerChallengeNumber,int playerNumber)
+    /// <summary>
+    /// 決めたチャレンジ枚数をセット
+    /// CPU用
+    /// </summary>
+    /// <param name="flowerChallengeNumber"></param>
+    /// <param name="playerNumber"></param>
+    public static void SetChallengeNumber(int flowerChallengeNumber, int playerNumber)
     {
         _flowerChallengeNumber = flowerChallengeNumber;
         _challengePlayerNumber = playerNumber;
@@ -340,13 +425,28 @@ public class GameSceneManager : MonoBehaviour
         challengeNumberSetSlider.value = value;
         challengeNumberSetSlider.minValue = minValue;
         challengeNumberSetSlider.maxValue = maxValue;
+        if (minValue >= maxValue)
+        {
+            okButtonOnChallenge.interactable = false;
+            challengeNumberSetSlider.interactable = false;
+        }
     }
 
     public static int Turn => _turn;
 
-    public static bool IsChallenge => _isChallenge;
+    public static GameModeTypes GameModeType => _gameModeType;
 
     public static int FlowerChallengeNumber => _flowerChallengeNumber;
 
+    public static int ChallengePlayerNumber => _challengePlayerNumber;
+
     public static int MaxFlowerChallengeNumber => _maxFlowerChallengeNumber;
+
+    public static int OpenedCardsNumber
+    {
+        get => _openedCardsNumber;
+        set => _openedCardsNumber = value;
+    }
+
+    public static List<CardField> CardFields => _cardFields;
 }

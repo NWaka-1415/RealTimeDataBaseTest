@@ -81,7 +81,7 @@ public class Card : MonoBehaviour
     public void Initialize(OverAllManager.Card.CardTypes cardType, Sprite front, Sprite back, bool isYours = true,
         bool isThrow = false)
     {
-        Initialize(rectTransform.localPosition, cardType, front, back, isYours, isThrow);
+        Initialize(transform.position, cardType, front, back, isYours, isThrow);
     }
 
     /// <summary>
@@ -99,8 +99,8 @@ public class Card : MonoBehaviour
     /// </summary>
     public void OnclickSelect()
     {
-        if(_decided) return;
-        _player.Select(this);
+        if (_decided) return;
+        _player.SelectCard(this);
     }
 
     /// <summary>
@@ -136,7 +136,12 @@ public class Card : MonoBehaviour
     /// </summary>
     public void ResetCard()
     {
+        if (_isThrow) return;
+        _decided = false;
+        transform.position = _defaultPos;
         _card.Close();
+        image.sprite = _isYours ? _frontSprite : _backSprite;
+        gameObject.SetActive(_isYours);
     }
 
     /// <summary>
@@ -145,6 +150,13 @@ public class Card : MonoBehaviour
     public void Open()
     {
         _card.Open();
+        image.sprite = _frontSprite;
+    }
+
+    public void ThrowAway()
+    {
+        _isThrow = true;
+        gameObject.SetActive(false);
     }
 
     public OverAllManager.Card.States State => _card.State;
@@ -152,4 +164,6 @@ public class Card : MonoBehaviour
     public OverAllManager.Card.CardTypes CardType => _card.CardType;
 
     public bool Decided => _decided;
+
+    public bool IsThrow => _isThrow;
 }

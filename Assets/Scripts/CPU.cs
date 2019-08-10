@@ -34,27 +34,30 @@ public class CPU : Player
         _isChallenge = false;
     }
 
-    public void StartThinking()
+    public void StartThinking(GameSceneManager.GameModeTypes gameModeType)
     {
         thinkingText.enabled = true;
-        if (GameSceneManager.GameModeType == GameSceneManager.GameModeTypes.PushCardMode)
+        if (gameModeType == GameSceneManager.GameModeTypes.PushCardMode)
         {
             //チャレンジ前
             float rand = Random.Range(0f, 1f);
             //後半の方がチャレンジ確率が上がる
             float per = GameSceneManager.Turn >= 2 ? 0.4f : 0.6f;
+            //スカルが自分の場に含まれている場合はチャレンジ確率を大幅に下げる
+            per = cardField.CheckSkull() ? 0.05f : per;
             _isChallenge = !(rand <= per);
             if (GameSceneManager.Turn < 1) _isChallenge = false;
         }
-        else if (GameSceneManager.GameModeType == GameSceneManager.GameModeTypes.SelectCardFromOtherPlayerMode)
+        else if (gameModeType == GameSceneManager.GameModeTypes.SelectCardFromOtherPlayerMode)
         {
+            Debug.Log("CPU OpenMyCards");
             OpenAllMyCards();
         }
     }
 
-    public void Thinking()
+    public void Thinking(GameSceneManager.GameModeTypes gameModeType)
     {
-        switch (GameSceneManager.GameModeType)
+        switch (gameModeType)
         {
             case GameSceneManager.GameModeTypes.PushCardMode:
                 if (_isChallenge) Challenge();
@@ -62,9 +65,17 @@ public class CPU : Player
                 break;
             case GameSceneManager.GameModeTypes.SelectChallengeNumberMode:
                 //チャレンジモード時
+                Debug.Log("OK!");
                 SelectChallengeNum();
                 break;
             case GameSceneManager.GameModeTypes.SelectCardFromOtherPlayerMode:
+                Debug.Log("Enter While 1");
+                while (!isClear && !isOut)
+                {
+                    Debug.Log($"!isClear:{!isClear},!isOut:{!isOut}\n&&:{!isClear && !isOut}");
+                    SelectRandomCardFromOtherPlayer();
+                }
+
                 break;
         }
     }
@@ -76,7 +87,7 @@ public class CPU : Player
         {
             int selectIndex = Random.Range(0, 4);
             selectCard = myCards[selectIndex];
-            loop = selectCard.Decided;
+            loop = selectCard.Decided || selectCard.IsThrow;
         }
 
         DecideSetCard();
@@ -96,7 +107,6 @@ public class CPU : Player
         else
         {
             int diff = GameSceneManager.MaxFlowerChallengeNumber - GameSceneManager.FlowerChallengeNumber;
-            Debug.Log(diff);
             if (diff <= 0)
             {
                 Pass();
@@ -108,7 +118,7 @@ public class CPU : Player
                 float per = diff >= GameSceneManager.MaxFlowerChallengeNumber / 2 ? 0.7f : 0.3f;
                 if (rand <= per)
                 {
-                    int flowerChallengeNum = Random.Range(GameSceneManager.FlowerChallengeNumber,
+                    int flowerChallengeNum = Random.Range(GameSceneManager.FlowerChallengeNumber + 1,
                         GameSceneManager.MaxFlowerChallengeNumber);
                     GameSceneManager.SetChallengeNumber(flowerChallengeNum, playerNumber);
                     GameSceneManager.Advance();
@@ -123,21 +133,46 @@ public class CPU : Player
 
     /// <summary>
     /// 他のプレイヤーからカードを選ぶ
+    /// もし自分やオープンしていないFieldを選んだ場合はやり直し
     /// </summary>
     private void SelectRandomCardFromOtherPlayer()
     {
-        bool loop = true;
-        while (loop)
+        List<CardField> selectCardFields = new List<CardField>();
+        selectCardField = null;
+        for (int i = 0; i < GameSceneManager.FlowerChallengeNumber - GameSceneManager.OpenedCardsNumber; i++)
         {
-            foreach (CardField field in GameSceneManager.CardFields)
+            while (true)
             {
-                loop = false;
-                if (this.cardField == field || field.CardsCount <= 0) loop = true;
-                else selectCardField = field;
+                int rand = Random.Range(0, GameSceneManager.CardFields.Count);
+                CardField field = GameSceneManager.CardFields[rand];
+                Debug.Log($"if({cardField == field || field.CardsCount <= 0})");
+                if (!(cardField == field || field.CardsCount <= 0))
+                {
+                    selectCardFields.Add(field);
+                    break;
+                }
             }
         }
 
-        DecideOpenCard();
+        Debug.Log($"CardFieldNum: {selectCardFields.Count}");
+
+//        while (true)
+//        {
+//            int rand = Random.Range(0, GameSceneManager.CardFields.Count);
+//            CardField field = GameSceneManager.CardFields[rand];
+//            Debug.Log($"if({cardField == field || field.CardsCount <= 0})");
+//            if (!(cardField == field || field.CardsCount <= 0))
+//            {
+//                selectCardField = field;
+//                break;
+//            }
+//        }
+
+        foreach (CardField field in selectCardFields)
+        {
+            selectCardField = field;
+            DecideOpenCard();
+        }
     }
 
     public void SetSelectThisButton()

@@ -16,6 +16,8 @@ public class Player : MonoBehaviour
 
     [SerializeField] private Text pointText = null;
 
+    [SerializeField] private Text challengingText = null;
+
     protected Card selectCard;
     protected CardField selectCardField;
 
@@ -38,6 +40,11 @@ public class Player : MonoBehaviour
 
     protected float time;
 
+    private void Update()
+    {
+        challengingText.enabled = GameSceneManager.ChallengePlayerNumber == playerNumber;
+    }
+
     public virtual void Initialize(OverAllManager.UserData userData)
     {
         this.userData = userData;
@@ -47,6 +54,7 @@ public class Player : MonoBehaviour
         isClear = false;
         selectCard = null;
         selectCardField = null;
+        challengingText.enabled = false;
         cardField.Initialize();
         cardField.SetParent(this);
     }
@@ -58,6 +66,7 @@ public class Player : MonoBehaviour
         isClear = false;
         selectCard = null;
         selectCardField = null;
+        challengingText.enabled = false;
         cardField.ResetThis();
         foreach (Card myCard in myCards)
         {
@@ -137,23 +146,23 @@ public class Player : MonoBehaviour
     {
         if (selectCardField == null) return;
         Card openCard = selectCardField.SelectField();
+        Debug.Log($"OpenCard:{openCard.name}");
         GameSceneManager.OpenedCardsNumber++;
         if (openCard.CardType == OverAllManager.Card.CardTypes.Skull)
         {
             //スカルを選んだらアウト！
-            StartCoroutine(Wait(1.5f, (() =>
-            {
-                isOut = true;
-                StartCoroutine(Wait(1.0f, (ThrowAwayCard)));
-            })));
+            isOut = true;
+            if (playerNumber == 0) StartCoroutine(Wait(1.5f, (() => { StartCoroutine(Wait(1.0f, (ThrowAwayCard))); })));
+            else ThrowAwayCard();
         }
         else
         {
             if (GameSceneManager.OpenedCardsNumber >= GameSceneManager.FlowerChallengeNumber)
             {
                 //クリア！
-                Debug.Log("Nice!");
-                StartCoroutine(Wait(1.5f, (GetPoint)));
+                isClear = true;
+                if (playerNumber == 0) StartCoroutine(Wait(1.5f, GetPoint));
+                else GetPoint();
             }
         }
 
@@ -165,12 +174,16 @@ public class Player : MonoBehaviour
     /// </summary>
     public void OpenAllMyCards()
     {
-        for (int i = 0; i < cardField.CardsCount; i++)
+        Debug.Log($"cardsCount: {cardField.CardsCount}");
+        int num = cardField.CardsCount;
+        for (int i = 0; i < num; i++)
         {
             selectCardField = cardField;
             DecideOpenCard();
             if (isOut) break;
         }
+
+        Debug.Log($"{this.gameObject.name}'s isOut: {isOut}");
     }
 
     /// <summary>
@@ -179,6 +192,7 @@ public class Player : MonoBehaviour
     public void Challenge()
     {
         GameSceneManager.SetChallenge(playerNumber);
+        challengingText.enabled = true;
     }
 
     /// <summary>
@@ -189,7 +203,6 @@ public class Player : MonoBehaviour
         point++;
         cardField.GetPoint();
         pointText.text = $"{point} / 2";
-        isClear = true;
     }
 
     /// <summary>

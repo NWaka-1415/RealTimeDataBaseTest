@@ -18,6 +18,8 @@ public class GameSceneManager : MonoBehaviour
     /// </summary>
     private static int _activeUserNumber;
 
+    private static int _startUserNumber;
+
     /// <summary>
     /// チャレンジ権を持つプレイヤーナンバー
     /// </summary>
@@ -25,6 +27,7 @@ public class GameSceneManager : MonoBehaviour
 
     /// <summary>
     /// チャレンジを宣言したプレイヤーナンバー
+    /// 現状不要
     /// </summary>
     private static int _sayChallengePlayerNumber;
 
@@ -99,6 +102,7 @@ public class GameSceneManager : MonoBehaviour
         Initialize();
 
         _activeUserNumber = 0;
+        _startUserNumber = _activeUserNumber;
         _turn = 0;
 
         challengeButton.interactable = false;
@@ -163,12 +167,12 @@ public class GameSceneManager : MonoBehaviour
                     //CPUs
                     if (_timeToTurnAndTurn <= 0f)
                     {
-                        FindActiveCPU(_activeUserNumber)?.Thinking();
+                        FindActiveCPU(_activeUserNumber)?.Thinking(_gameModeType);
                         _timeToTurnAndTurn = 1f;
                     }
                     else if (_timeToTurnAndTurn >= 1f)
                     {
-                        FindActiveCPU(_activeUserNumber)?.StartThinking();
+                        FindActiveCPU(_activeUserNumber)?.StartThinking(_gameModeType);
                         _timeToTurnAndTurn -= Time.deltaTime;
                     }
                     else
@@ -188,7 +192,7 @@ public class GameSceneManager : MonoBehaviour
                         cpus[i].SetSelectThisButton();
                     }
 
-                    break;
+                    return;
                 }
 
                 if (_prevGameModeType != _gameModeType && _gameModeType == GameModeTypes.SelectChallengeNumberMode)
@@ -199,23 +203,23 @@ public class GameSceneManager : MonoBehaviour
 
                 //チャレンジした後の動作
                 //ボタンの無効化有効化
-                okButtonOnChallenge.interactable = _activeUserNumber == 0;
-                passButton.interactable = _activeUserNumber == 0;
-                challengeNumberSetSlider.interactable = _activeUserNumber == 0;
+                okButtonOnChallenge.interactable = (_activeUserNumber == 0);
+                passButton.interactable = (_activeUserNumber == 0);
+                challengeNumberSetSlider.interactable = (_activeUserNumber == 0);
                 challengeNumberText.text = $"{challengeNumberSetSlider.value}枚";
                 if (_activeUserNumber != 0)
                 {
                     //CPUs
                     if (_timeToTurnAndTurn <= 0f)
                     {
-                        FindActiveCPU(_activeUserNumber).Thinking();
+                        FindActiveCPU(_activeUserNumber).Thinking(_gameModeType);
                         selectNumber.text = $"{_flowerChallengeNumber}枚";
                         SetSlider(1, _flowerChallengeNumber + 1, _maxFlowerChallengeNumber);
                         _timeToTurnAndTurn = 1f;
                     }
                     else if (_timeToTurnAndTurn >= 1f)
                     {
-                        FindActiveCPU(_activeUserNumber).StartThinking();
+                        FindActiveCPU(_activeUserNumber).StartThinking(_gameModeType);
                         _timeToTurnAndTurn -= Time.deltaTime;
                     }
                     else
@@ -238,17 +242,29 @@ public class GameSceneManager : MonoBehaviour
                     //CPUs
                     if (_timeToTurnAndTurn <= 0f)
                     {
-                        FindActiveCPU(_activeUserNumber).Thinking();
+                        Debug.Log("Enter Thinking");
+                        Debug.Log($"ActiveNumber: {_activeUserNumber}");
+                        Debug.Log($"ActiveUser: {FindActiveCPU(_activeUserNumber)}");
+                        FindActiveCPU(_activeUserNumber)?.Thinking(_gameModeType);
                         selectCardNumberText.text = $"{_openedCardsNumber} / {_flowerChallengeNumber}枚";
                         _timeToTurnAndTurn = 1f;
+                        player.ResetThis();
+                        for (int i = 0; i < OverAllManager.PlayerNumber - 1; i++)
+                        {
+                            cpus[i].ResetThis();
+                        }
+
+                        Initialize();
                     }
                     else if (_timeToTurnAndTurn >= 1f)
                     {
-                        FindActiveCPU(_activeUserNumber).StartThinking();
+                        FindActiveCPU(_activeUserNumber).StartThinking(_gameModeType);
+                        Debug.Log("Complete StartThinking");
                         _timeToTurnAndTurn -= Time.deltaTime;
                     }
                     else
                     {
+                        Debug.Log("TimeMinus");
                         _timeToTurnAndTurn -= Time.deltaTime;
                     }
                 }
@@ -279,6 +295,7 @@ public class GameSceneManager : MonoBehaviour
     private void Initialize()
     {
         _turn = 0;
+        _startUserNumber = _activeUserNumber;
         _timeToTurnAndTurn = 1f;
         _flowerChallengeNumber = 0;
         _challengePlayerNumber = -1;
@@ -349,9 +366,10 @@ public class GameSceneManager : MonoBehaviour
         _activeUserNumber++;
         if (_activeUserNumber >= OverAllManager.PlayerNumber)
         {
-            AdvanceTurn();
             _activeUserNumber = 0;
         }
+
+        if (_activeUserNumber == _startUserNumber) AdvanceTurn();
     }
 
     /// <summary>

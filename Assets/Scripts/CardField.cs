@@ -118,6 +118,16 @@ public class CardField : MonoBehaviour
         DisableCards();
     }
 
+    public bool CheckSkull()
+    {
+        foreach (Card card in cards)
+        {
+            if (card.CardType == OverAllManager.Card.CardTypes.Skull) return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// 場にあるカードをすべて固定
     /// </summary>
